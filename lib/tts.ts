@@ -1,23 +1,68 @@
 import fs from "fs";
 import axios, { type AxiosResponse } from "axios";
-import type { VoiceSpeaker } from "./enums";
+import translate from "@iamtraction/google-translate";
+import { Language, VoiceSpeaker } from "./enums";
 
+/**
+ * Interface for the components that can be passed to the TextToSpeech constructor.
+ */
 interface TTSComponents {
+  /**
+   * Session ID for accessing the TikTok text-to-speech API.
+   */
   sessionId?: string;
+  /**
+   * A boolean flag indicates whether debug logs should be enabled.
+   */
   debugLog?: boolean;
 }
 
+/**
+ * Arguments for the createSpeech method of the TextToSpeech class.
+ */
 interface TTSArgs {
-  voice: VoiceSpeaker | string;
+  /**
+   * The text is to be converted to speech.
+   */
   text: string;
+  /**
+   * Optional name for the audio file.
+   */
   audioName?: string;
+  /**
+   * A boolean flag indicates whether to detect the language of the input text.
+   */
+  detectLanguage?: boolean;
+  /**
+   * The voice speaker is to be used for the generated speech.
+   */
+  voice?: VoiceSpeaker | string;
 }
 
+/**
+ * The TextToSpeech class provides functionalities for converting text to speech using the TikTok text-to-speech API.
+ */
 export class TextToSpeech {
+  /**
+   * Represents the URL of the TikTok text-to-speech API.
+   * @private
+   */
   private apiUrl: string;
+  /**
+   * The session ID required for accessing the TikTok text-to-speech API.
+   * @public
+   */
   public sessionId: string | undefined;
+  /**
+   * A boolean flag indicates whether debug logging is enabled.
+   * @public
+   */
   public debugLog: boolean;
 
+  /**
+   * Constructs a new TextToSpeech instance.
+   * @param components Optional components to initialize the TextToSpeech instance.
+   */
   constructor(components?: TTSComponents) {
     this.apiUrl =
       "https://api16-normal-v6.tiktokv.com/media/api/text/speech/invoke";
@@ -25,9 +70,22 @@ export class TextToSpeech {
     this.debugLog = components?.debugLog || false;
   }
 
-  public async createSpeech(args: TTSArgs) {
+  /**
+   * Generates speech audio from the provided text using the TikTok text-to-speech API.
+   * @param args Arguments for generating the speech.
+   * @returns A Promise that resolves when the speech audio is successfully generated.
+   */
+  public async createSpeech(args: TTSArgs): Promise<void> {
+    const detectedLanguage = args.detectLanguage
+      ? await this.detectLanguage(args.text)
+      : VoiceSpeaker.Jessie;
+
     const formatText = this.formatText(args.text);
-    const fullUrl = `${this.apiUrl}/?text_speaker=${args.voice}&req_text=${formatText}&speaker_map_type=0&aid=1233`;
+
+    const fullUrl = `${this.apiUrl}/?text_speaker=${
+      args.voice || detectedLanguage
+    }&req_text=${formatText}&speaker_map_type=0&aid=1233`;
+
     const headers = {
       "User-Agent":
         "com.zhiliaoapp.musically/2022600030 (Linux; U; Android 7.1.2; es_ES; SM-G988N; Build/NRD90M;tt-ok/3.12.13.1)",
@@ -41,7 +99,11 @@ export class TextToSpeech {
       });
       const { status_code: statusCode, data } = result.data;
 
-      this.createLog(`Fetched audio with status code: ${statusCode}`);
+      this.createLog([
+        `Audio Language: ${detectedLanguage}`,
+        `Auto Detect Language: ${args.detectLanguage}`,
+        `Fetched Audio with Status Code: ${statusCode}`,
+      ]);
 
       if (statusCode !== 0) {
         throw new Error(this.handleError(statusCode));
@@ -49,19 +111,29 @@ export class TextToSpeech {
 
       const audioFilename = `${args.audioName || "gemini-speech"}.mp3`;
       fs.writeFileSync(audioFilename, Buffer.from(data.v_str, "base64"));
-      this.createLog(`Saved audio with name: ${audioFilename}`);
+      this.createLog(`Saved Audio with Name: ${audioFilename}`);
     } catch (error) {
       console.error("Error occurring when generating speech:", error);
     }
   }
 
-  private formatText(text: string) {
+  /**
+   * Formats the provided text for the TikTok text-to-speech API.
+   * @param text The text to be formatted.
+   * @returns The formatted text.
+   */
+  private formatText(text: string): string {
     return text.replace(/^[*-]\s*|\s+/gm, (match) =>
       match === "* " || match === "- " ? "" : "+"
     );
   }
 
-  private handleError(statusCode: number) {
+  /**
+   * Handles errors based on the status code returned by the TikTok text-to-speech API.
+   * @param statusCode The status code returned by the API.
+   * @returns The error message corresponding to the status code.
+   */
+  private handleError(statusCode: number): string {
     const errorMessages: { [key: number]: string } = {
       1: `It's likely that your TikTok session ID is no longer valid. Attempt to obtain a new one.`,
       2: `The provided content is just too long.`,
@@ -72,13 +144,30 @@ export class TextToSpeech {
     return errorMessages[statusCode] || `Unknown status code: ${statusCode}`;
   }
 
-  private createLog(text: string[] | string) {
+  /**
+   * Creates debug logs with the provided information if debug logging is enabled.
+   * @param info Information to be logged. It can be a string or an array of strings.
+   */
+  private createLog(info: string[] | string): void {
     if (!this.debugLog) return;
 
     const prefix =
-      typeof text === "string"
-        ? `* ${text}`
-        : text.map((line) => `\n* ${line}`).join("\n");
-    console.log(`\n[DEBUG TextToSpeech]\n${prefix}`);
+      typeof info === "string"
+        ? `* ${info}`
+        : info.map((line) => `* ${line}`).join("\n");
+    console.log(`[DEBUG TextToSpeech]\n${prefix}`);
+  }
+
+  /**
+   * Detects the language of the provided text using Google Translate.
+   * @param text The text for language detection.
+   * @returns The detected language code.
+   */
+  private async detectLanguage(text: string): Promise<string> {
+    const res = await translate(text);
+    const detectedLanguage = Object.keys(Language).find(
+      (key: string) => key === res.from.language.iso.toUpperCase()
+    );
+    return Language[detectedLanguage as keyof typeof Language] || Language.EN;
   }
 }

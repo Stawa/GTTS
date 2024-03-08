@@ -23,3 +23,5 @@
 export * from "./gemini";
 export * from "./tts";
 export * from "./enums";
+export * from "./speech/audio";
+export * from "./speech/voice";

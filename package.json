@@ -1,7 +1,7 @@
 {
   "name": "@stawa/gemini-text-to-speech",
   "author": "Stawa",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This project converts written material into speech by using Google AI (Gemini) for text creation or internet searches.",
   "module": "index.ts",
   "type": "module",
@@ -12,6 +12,14 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "rm -rf dist && tsc --build"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -21,6 +29,9 @@
   "dependencies": {
     "@google-cloud/text-to-speech": "^5.1.0",
     "@google/generative-ai": "^0.2.1",
-    "axios": "^1.6.7"
+    "@iamtraction/google-translate": "^2.0.1",
+    "axios": "^1.6.7",
+    "music-metadata": "^7.14.0",
+    "speech-detector": "^1.0.0"
   }
 }

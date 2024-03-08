@@ -18,6 +18,15 @@
 
 This project is being tested on Linux using the Ubuntu 23.10 x86_64 distribution. I'm not sure whether this will work on Windows or MacOS.
 
+| Task                         | Priority | Complete | Status      |
+| ---------------------------- | -------- | -------- | ----------- |
+| Implement Gemini Chat        | High     | &check;  | Completed   |
+| Develop Voice Recognition    | High     | &cross;  | In Progress |
+| Implement Language Detection | Medium   | &check;  | Completed   |
+| Implement Audio Player       | Low      | &check;  | Completed   |
+| Define Enums                 | Low      | &check;  | Completed   |
+| Integrate Debugging          | Low      | &check;  | Completed   |
+
 <h3> <span class="emoji">📜</span> Table of Contents </h3>
 
 1. <a href="#--project-installlation-"> <b>Project Installlation</b> </a>

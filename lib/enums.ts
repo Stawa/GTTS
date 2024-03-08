@@ -129,3 +129,15 @@ export enum VoiceSpeaker {
   Chipmunk = "en_male_m2_xhxs_m03_silly",
   Dramatic = "en_female_ht_f08_wonderful_world",
 }
+
+export enum Language {
+  EN = VoiceSpeaker.Jessie,
+  ES = VoiceSpeaker.Warm,
+  FR = VoiceSpeaker.FrenchMale1,
+  PT = VoiceSpeaker.PortugueseBRFemale1,
+  DE = VoiceSpeaker.GermanFemale,
+  ID = VoiceSpeaker.IndonesianFemale,
+  JP = VoiceSpeaker.JapaneseFemale1,
+  KR = VoiceSpeaker.KoreanMale1,
+  VN = VoiceSpeaker.VietnameseFemale,
+}
