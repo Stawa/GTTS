@@ -18,14 +18,15 @@
 
 This project is being tested on Linux using the Ubuntu 23.10 x86_64 distribution. I'm not sure whether this will work on Windows or MacOS.
 
-| Task                         | Priority | Complete | Status      |
-| ---------------------------- | -------- | -------- | ----------- |
-| Implement Gemini Chat        | High     | &check;  | Completed   |
-| Develop Voice Recognition    | High     | &cross;  | In Progress |
-| Implement Language Detection | Medium   | &check;  | Completed   |
-| Implement Audio Player       | Low      | &check;  | Completed   |
-| Define Enums                 | Low      | &check;  | Completed   |
-| Integrate Debugging          | Low      | &check;  | Completed   |
+| Task                               | Priority | Complete | Status      |
+| ---------------------------------- | :------: | :------: | ----------- |
+| Implement Gemini Chat              |   High   | &check;  | Completed   |
+| Develop Voice Recognition          |   High   | &cross;  | In Progress |
+| Implement Audio Language Detection |   High   | &cross;  | In Progress |
+| Implement Text Language Detection  |  Medium  | &check;  | Completed   |
+| Implement Audio Player             |   Low    | &check;  | Completed   |
+| Define Enums                       |   Low    | &check;  | Completed   |
+| Integrate Debugging                |   Low    | &check;  | Completed   |
 
 <h3> <span class="emoji">📜</span> Table of Contents </h3>
 
@@ -48,3 +49,10 @@ $ bun install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
 ```ts
 console.log("Soon!");
 ```
+
+<h3> <span class="emoji">📌</span> Author </h3>
+
+| Avatar                                                                                          | GitHub                            |
+| ----------------------------------------------------------------------------------------------- | --------------------------------- |
+| <img src="https://avatars.githubusercontent.com/u/69102292" alt="Developer Avatar" width="50"/> | [Stawa](https://github.com/Stawa) |
+| <img src="https://avatars.githubusercontent.com/u/121237326" alt="Developer Avatar" width="50"/> | [TeenYsMASTER](https://github.com/TeenYsMASTER) |
