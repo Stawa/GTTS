@@ -1,4 +1,7 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "child_process";
+import fs from "fs";
+import axios, { type AxiosResponse } from "axios";
+import querystring from "querystring";
 
 /**
  * Interface for the components that can be passed to the VoiceRecognition constructor.
@@ -8,6 +11,23 @@ interface STTComponents {
    * A boolean flag indicates whether debug logging is enabled.
    */
   debugLog?: boolean;
+}
+
+/**
+ * Interface for Google Speech components.
+ */
+interface GoogleSpeechComponents {
+  language: string;
+  apiKey: string;
+  audioFile: string;
+}
+
+/**
+ * Represents a transcript result containing transcribed text and a confidence level.
+ */
+interface TranscriptResult {
+  alternative: { transcript: string; confidence?: number }[];
+  final: boolean;
 }
 
 /**
@@ -25,6 +45,12 @@ export class VoiceRecognition {
    * @private
    */
   private debugLogged: boolean;
+  /**
+   * Represents the URL of the Google Speech to Text API.
+   * @private
+   * @readonly
+   */
+  private readonly apiUrl: string;
 
   /**
    * Constructs a new VoiceRecognition instance.
@@ -34,6 +60,7 @@ export class VoiceRecognition {
   constructor(components?: STTComponents) {
     this.debugLog = components?.debugLog || false;
     this.debugLogged = false;
+    this.apiUrl = "https://www.google.com/speech-api/v2/recognize";
   }
 
   /**
@@ -45,7 +72,11 @@ export class VoiceRecognition {
       "-t",
       "alsa",
       "default",
-      `${filename}.wav`,
+      "--encoding",
+      "signed-integer",
+      "--bits 16",
+      "--rate 16000",
+      `${filename}.flac`,
       "silence",
       "1",
       "0.1",
@@ -69,6 +100,49 @@ export class VoiceRecognition {
         this.createLog([`VoiceRecognition Closed with Code: ${code}`]);
       }
     });
+  }
+
+  /**
+   * Fetch transcript from the Google Speech-to-Text API.
+   * @param components - Object containing Google Speech components.
+   * @returns {Promise<TranscriptResult | null>} - Promise containing the AxiosResponse.
+   */
+  public async fetchTranscript(
+    components: GoogleSpeechComponents
+  ): Promise<TranscriptResult | null> {
+    const params = querystring.stringify({
+      output: "json",
+      lang: components.language,
+      key: components.apiKey,
+    });
+    const headers = { "Content-Type": "audio/x-flac; rate=16000;" };
+    const audioData = fs.readFileSync(components.audioFile);
+    const url = `${this.apiUrl}?${params}`;
+    const response = await axios.post(url, audioData, { headers });
+    return this.parseResponse(response.data);
+  }
+
+  /**
+   * Parses the response text and extracts transcript results.
+   * @param {string} responseText - The response text to parse.
+   * @returns {TranscriptResult | null} The parsed transcript result, or null if no result is found.
+   */
+  private parseResponse(responseText: string): TranscriptResult | null {
+    const lines = responseText.split("\n");
+    for (const line of lines) {
+      if (!line) continue;
+
+      const result: TranscriptResult[] = JSON.parse(line).result;
+
+      if (result.length !== 0) {
+        if (result[0].alternative.length === 0) {
+          throw new Error("No transcribed text found in the response.");
+        }
+        return result[0];
+      }
+    }
+
+    return null;
   }
 
   /**

@@ -46,8 +46,9 @@ export class TextToSpeech {
   /**
    * Represents the URL of the TikTok text-to-speech API.
    * @private
+   * @readonly
    */
-  private apiUrl: string;
+  private readonly apiUrl: string;
   /**
    * The session ID required for accessing the TikTok text-to-speech API.
    * @public
@@ -75,7 +76,7 @@ export class TextToSpeech {
    * @param args Arguments for generating the speech.
    * @returns A Promise that resolves when the speech audio is successfully generated.
    */
-  public async createSpeech(args: TTSArgs): Promise<void> {
+  public async createSpeech(args: TTSArgs): Promise<string | undefined> {
     const detectedLanguage = args.detectLanguage
       ? await this.detectLanguage(args.text)
       : VoiceSpeaker.Jessie;
@@ -112,6 +113,7 @@ export class TextToSpeech {
       const audioFilename = `${args.audioName || "gemini-speech"}.mp3`;
       fs.writeFileSync(audioFilename, Buffer.from(data.v_str, "base64"));
       this.createLog(`Saved Audio with Name: ${audioFilename}`);
+      return audioFilename;
     } catch (error) {
       console.error("Error occurring when generating speech:", error);
     }
