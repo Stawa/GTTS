@@ -1,0 +1,12 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "includeVersion": true,
+  "plugin": ["typedoc-material-theme"],
+  "themeColor": "#cb9820",
+  "searchGroupBoosts": {
+    "Classes": 1.5
+  },
+  "navigationLinks": {
+    "GitHub": "https://github.com/Stawa/Gemini-Text-To-Speech"
+  }
+}
