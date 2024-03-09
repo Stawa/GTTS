@@ -1,30 +1,16 @@
-name: Build and Deploy TypeDoc
-
-on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
       - name: Detect package manager
         id: detect-package-manager
         run: |
-          echo "manager=npm" >> $GITHUB_OUTPUT
+          echo "manager=bun" >> $GITHUB_OUTPUT
           echo "command=ci" >> $GITHUB_OUTPUT
-          echo "runner=npx --no-install" >> $GITHUB_OUTPUT
+          echo "runner=bun exec --no-install" >> $GITHUB_OUTPUT
           exit 0
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -33,7 +19,7 @@ jobs:
           cache: ${{ steps.detect-package-manager.outputs.manager }}
       - name: Install dependencies including TypeDoc
         run: |
-          npm install typedoc typedoc-material-theme
+          bun add typedoc typedoc-material-theme
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
