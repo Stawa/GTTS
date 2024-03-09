@@ -32,6 +32,7 @@ This project is being tested on Linux using the Ubuntu 23.10 x86_64 distribution
 
 1. <a href="#--project-installlation-"> <b>Project Installlation</b> </a>
 2. <a href="#--project-examples-"> <b>Project Examples</b> </a>
+3. <a href="#--author--"> <b>Project Author</b> </a>
 
 <h4> <span class="emoji">📦</span> Project Installlation </h4>
 
@@ -50,9 +51,9 @@ $ bun install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
 console.log("Soon!");
 ```
 
-<h3> <span class="emoji">📌</span> Author </h3>
+<h3> <span class="emoji">🛠</span> Project Author </h3>
 
-| Avatar                                                                                          | GitHub                            |
-| ----------------------------------------------------------------------------------------------- | --------------------------------- |
-| <img src="https://avatars.githubusercontent.com/u/69102292" alt="Developer Avatar" width="50"/> | [Stawa](https://github.com/Stawa) |
+| Developer Avatar                                                                                 | GitHub                                          |
+| ------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| <img src="https://avatars.githubusercontent.com/u/69102292" alt="Developer Avatar" width="50"/>  | [Stawa](https://github.com/Stawa)               |
 | <img src="https://avatars.githubusercontent.com/u/121237326" alt="Developer Avatar" width="50"/> | [TeenYsMASTER](https://github.com/TeenYsMASTER) |
