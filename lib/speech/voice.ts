@@ -58,7 +58,7 @@ export class VoiceRecognition {
    * @constructor
    */
   constructor(components?: STTComponents) {
-    this.debugLog = components?.debugLog || false;
+    this.debugLog = components?.debugLog ?? false;
     this.debugLogged = false;
     this.apiUrl = "https://www.google.com/speech-api/v2/recognize";
   }
@@ -68,7 +68,7 @@ export class VoiceRecognition {
    * @param filename The filename of the audio file for voice recognition.
    */
   public voiceRecognition(filename: string): void {
-    const command: ChildProcessWithoutNullStreams = spawn("sox", [
+    const command: ChildProcessWithoutNullStreams = spawn("/usr/bin/sox", [
       "-t",
       "alsa",
       "default",
@@ -159,10 +159,11 @@ export class VoiceRecognition {
           )
         )
         .forEach((line) => {
-          const match = line.match(
-            /^(Input File|Channels|Sample Rate|Precision|Sample Encoding).*/
-          )?.[0];
-          console.log(`* ${match}`);
+          const match =
+            /^(Input File|Channels|Sample Rate|Precision|Sample Encoding).*/.exec(
+              line
+            );
+          match && console.log(`* ${match[0]}`);
         });
 
     this.debugLogged = true;

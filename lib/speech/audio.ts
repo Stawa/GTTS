@@ -85,7 +85,7 @@ export class AudioGemini {
    * @param components Optional components to initialize the AudioGemini instance.
    */
   constructor(components?: AudioComponents) {
-    this.debugLog = components?.debugLog || false;
+    this.debugLog = components?.debugLog ?? false;
     this.debugLogged = false;
   }
 
@@ -94,7 +94,7 @@ export class AudioGemini {
    * @param filename The filename of the audio file to be played.
    */
   public playAudio(filename: string): void {
-    const command: ChildProcessWithoutNullStreams = spawn("play", [filename]);
+    const command: ChildProcessWithoutNullStreams = spawn("/usr/bin/play", [filename]);
 
     command.stderr.on("data", async (_data) => {
       if (this.debugLog && !this.debugLogged) {

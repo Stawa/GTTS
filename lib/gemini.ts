@@ -41,8 +41,8 @@ export class GoogleGemini {
    * @param components Additional components to set the GoogleGemini instance setup.
    */
   constructor(components?: GeminiComponents) {
-    this.apiKey = components?.apiKey || process.env.GEMINI_API_KEY;
-    this.debugLog = components?.debugLog || false;
+    this.apiKey = components?.apiKey ?? process.env.GEMINI_API_KEY;
+    this.debugLog = components?.debugLog ?? false;
     this.client = this.apiKey
       ? new GoogleGenerativeAI(this.apiKey)
       : (() => {

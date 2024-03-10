@@ -67,8 +67,8 @@ export class TextToSpeech {
   constructor(components?: TTSComponents) {
     this.apiUrl =
       "https://api16-normal-v6.tiktokv.com/media/api/text/speech/invoke";
-    this.sessionId = components?.sessionId || process.env.TIKTOK_SESSION_ID;
-    this.debugLog = components?.debugLog || false;
+    this.sessionId = components?.sessionId ?? process.env.TIKTOK_SESSION_ID;
+    this.debugLog = components?.debugLog ?? false;
   }
 
   /**
@@ -84,7 +84,7 @@ export class TextToSpeech {
     const formatText = this.formatText(args.text);
 
     const fullUrl = `${this.apiUrl}/?text_speaker=${
-      args.voice || detectedLanguage
+      args.voice ?? detectedLanguage
     }&req_text=${formatText}&speaker_map_type=0&aid=1233`;
 
     const headers = {
@@ -110,7 +110,7 @@ export class TextToSpeech {
         throw new Error(this.handleError(statusCode));
       }
 
-      const audioFilename = `${args.audioName || "gemini-speech"}.mp3`;
+      const audioFilename = `${args.audioName ?? "gemini-speech"}.mp3`;
       fs.writeFileSync(audioFilename, Buffer.from(data.v_str, "base64"));
       this.createLog(`Saved Audio with Name: ${audioFilename}`);
       return audioFilename;
@@ -126,7 +126,7 @@ export class TextToSpeech {
    */
   private formatText(text: string): string {
     return text.replace(/^[*-]\s*|\s+/gm, (match) =>
-      match === "* " || match === "- " ? "" : "+"
+      match === "* " ?? match === "- " ? "" : "+"
     );
   }
 
@@ -143,7 +143,7 @@ export class TextToSpeech {
       5: `Failed to locate the session ID.`,
     };
 
-    return errorMessages[statusCode] || `Unknown status code: ${statusCode}`;
+    return errorMessages[statusCode] ?? `Unknown status code: ${statusCode}`;
   }
 
   /**
@@ -170,6 +170,6 @@ export class TextToSpeech {
     const detectedLanguage = Object.keys(Language).find(
       (key: string) => key === res.from.language.iso.toUpperCase()
     );
-    return Language[detectedLanguage as keyof typeof Language] || Language.EN;
+    return Language[detectedLanguage as keyof typeof Language] ?? Language.EN;
   }
 }
