@@ -2,9 +2,7 @@ export enum VoiceSpeaker {
   // English
   GameOn = "en_male_jomboy",
   Jessie = "en_us_002",
-  Warm = "es_mx_002",
   Wacky = "en_male_funny",
-  Scream = "en_us_ghostface",
   Empathetic = "en_female_samc",
   Serious = "en_male_cody",
   BeautyGuru = "en_female_makeup",
@@ -118,21 +116,11 @@ export enum VoiceSpeaker {
   // Vietnamese
   VietnameseFemale = "BV074_streaming",
   VietnameseMale = "BV075_streaming",
-
-  // Other
-  Alto = "en_female_f08_salut_damour",
-  Tenor = "en_male_m03_lobby",
-  SunshineSoon = "en_male_m03_sunshine_soon",
-  WarmyBreeze = "en_female_f08_warmy_breeze",
-  Glorious = "en_female_ht_f08_glorious",
-  ItGoesUp = "en_male_sing_funny_it_goes_up",
-  Chipmunk = "en_male_m2_xhxs_m03_silly",
-  Dramatic = "en_female_ht_f08_wonderful_world",
 }
 
 export enum Language {
   EN = VoiceSpeaker.Jessie,
-  ES = VoiceSpeaker.Warm,
+  ES = VoiceSpeaker.SpanishMXMale,
   FR = VoiceSpeaker.FrenchMale1,
   PT = VoiceSpeaker.PortugueseBRFemale1,
   DE = VoiceSpeaker.GermanFemale,
