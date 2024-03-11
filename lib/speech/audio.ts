@@ -94,7 +94,9 @@ export class AudioGemini {
    * @param filename The filename of the audio file to be played.
    */
   public playAudio(filename: string): void {
-    const command: ChildProcessWithoutNullStreams = spawn("/usr/bin/play", [filename]);
+    const command: ChildProcessWithoutNullStreams = spawn("/usr/bin/play", [
+      filename,
+    ]);
 
     command.stderr.on("data", async (_data) => {
       if (this.debugLog && !this.debugLogged) {
@@ -116,9 +118,8 @@ export class AudioGemini {
    * @param info Information about the audio file or a string message to be logged.
    */
   private createLog(info: AudioDetails | string): void {
-    typeof info === "string"
-      ? console.log(`[DEBUG AudioGemini]\n* ${info}`)
-      : null;
+    typeof info === "string" && console.log(`[DEBUG AudioGemini]\n* ${info}`);
+
     const format: AudioDetails =
       typeof info === "string" ? ({} as AudioDetails) : info;
 

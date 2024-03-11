@@ -117,15 +117,3 @@ export enum VoiceSpeaker {
   VietnameseFemale = "BV074_streaming",
   VietnameseMale = "BV075_streaming",
 }
-
-export enum Language {
-  EN = VoiceSpeaker.Jessie,
-  ES = VoiceSpeaker.SpanishMXMale,
-  FR = VoiceSpeaker.FrenchMale1,
-  PT = VoiceSpeaker.PortugueseBRFemale1,
-  DE = VoiceSpeaker.GermanFemale,
-  ID = VoiceSpeaker.IndonesianFemale,
-  JP = VoiceSpeaker.JapaneseFemale1,
-  KR = VoiceSpeaker.KoreanMale1,
-  VN = VoiceSpeaker.VietnameseFemale,
-}

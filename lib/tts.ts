@@ -1,7 +1,7 @@
 import fs from "fs";
 import axios, { type AxiosResponse } from "axios";
 import translate from "@iamtraction/google-translate";
-import { Language, VoiceSpeaker } from "./enums";
+import { VoiceSpeaker } from "./enums";
 
 /**
  * Interface for the components that can be passed to the TextToSpeech constructor.
@@ -125,8 +125,8 @@ export class TextToSpeech {
    * @returns The formatted text.
    */
   private formatText(text: string): string {
-    return text.replace(/^[*-]\s*|\s+/gm, (match) =>
-      match === "* " ?? match === "- " ? "" : "+"
+    return text.replace(/(^([*-]\s*)|\s+)/gm, (_match, replacedText) =>
+      replacedText ? "" : "+"
     );
   }
 
@@ -166,10 +166,22 @@ export class TextToSpeech {
    * @returns The detected language code.
    */
   private async detectLanguage(text: string): Promise<string> {
+    const lang = {
+      EN: VoiceSpeaker.Jessie,
+      ES: VoiceSpeaker.SpanishMXMale,
+      FR: VoiceSpeaker.FrenchMale1,
+      PT: VoiceSpeaker.PortugueseBRFemale1,
+      DE: VoiceSpeaker.GermanFemale,
+      ID: VoiceSpeaker.IndonesianFemale,
+      JP: VoiceSpeaker.JapaneseFemale1,
+      KR: VoiceSpeaker.KoreanMale1,
+      VN: VoiceSpeaker.VietnameseFemale,
+    };
     const res = await translate(text);
-    const detectedLanguage = Object.keys(Language).find(
+    const detectedLanguageKey = Object.keys(lang).find(
       (key: string) => key === res.from.language.iso.toUpperCase()
     );
-    return Language[detectedLanguage as keyof typeof Language] ?? Language.EN;
+    const detectedLanguage = detectedLanguageKey ?? "EN";
+    return lang[detectedLanguage as keyof typeof lang];
   }
 }
