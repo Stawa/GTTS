@@ -51,7 +51,7 @@ This project is being tested on Linux using the Ubuntu 23.10 x86_64 distribution
 <p> After installing the necessary libraries, proceed to install the repository by using the following commands: </p>
 
 ```bash
-# NPM
+# npm
 $ npm install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
 # Bun
 $ bun install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
@@ -70,14 +70,28 @@ $ bun install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
 
 <p> If you are using <code>.env</code>, you can use these following example of our <code>.env</code> file: </p>
 
-```
+```bash
 GEMINI_API_KEY=XXXXXXXXXXXXXXXXXXXXXXX
 TIKTOK_SESSION_ID=XXXXXXXXXXXXXXXXXXXX
 GOOGLE_SPEECH_API_KEY=XXXXXXXXXXXXXXXX
 ```
 
+<p> This is an example of how you get a generated response from the Google Gemini API; it only takes one function: </p>
+
 ```ts
-console.log("Soon!");
+import { GoogleGemini } from "@stawa/gemini-text-to-speech";
+
+const google = new GoogleGemini({
+   apiKey: "XXXXX", // No need if you already put it on .env file.
+   debugLog: true;
+})
+
+async function app() {
+   const res = await google.chat("When was Facebook launched?");
+   console.log(res);
+};
+
+app();
 ```
 
 <h3> <span class="emoji">🛠</span> Project Author </h3>
