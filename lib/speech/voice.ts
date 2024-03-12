@@ -11,6 +11,7 @@ interface STTComponents {
    * A boolean flag indicates whether debug logging is enabled.
    */
   debugLog?: boolean;
+  apiKey?: string;
 }
 
 /**
@@ -18,7 +19,6 @@ interface STTComponents {
  */
 interface GoogleSpeechComponents {
   language: string;
-  apiKey: string;
   audioFile: string;
 }
 
@@ -51,6 +51,10 @@ export class VoiceRecognition {
    * @readonly
    */
   private readonly apiUrl: string;
+  /**
+   * API key for accessing the Google Speech service.
+   */
+  apiKey: string | undefined;
 
   /**
    * Constructs a new VoiceRecognition instance.
@@ -61,6 +65,7 @@ export class VoiceRecognition {
     this.debugLog = components?.debugLog ?? false;
     this.debugLogged = false;
     this.apiUrl = "https://www.google.com/speech-api/v2/recognize";
+    this.apiKey = components?.apiKey ?? process.env.TIKTOK_SESSION_ID;
   }
 
   /**
@@ -113,7 +118,7 @@ export class VoiceRecognition {
     const params = querystring.stringify({
       output: "json",
       lang: components.language,
-      key: components.apiKey,
+      key: this.apiKey,
     });
     const headers = { "Content-Type": "audio/x-flac; rate=16000;" };
     const audioData = fs.readFileSync(components.audioFile);

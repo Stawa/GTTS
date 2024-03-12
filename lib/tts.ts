@@ -81,11 +81,7 @@ export class TextToSpeech {
       ? await this.detectLanguage(args.text)
       : VoiceSpeaker.Jessie;
 
-    const formatText = this.formatText(args.text);
-
-    const fullUrl = `${this.apiUrl}/?text_speaker=${
-      args.voice ?? detectedLanguage
-    }&req_text=${formatText}&speaker_map_type=0&aid=1233`;
+    const formattedText = this.formatText(args.text);
 
     const headers = {
       "User-Agent":
@@ -94,24 +90,34 @@ export class TextToSpeech {
       "Accept-Encoding": "gzip,deflate,compress",
     };
 
+    this.createLog([
+      `Audio Language: ${detectedLanguage}`,
+      `Auto Detect Language: ${args.detectLanguage}`,
+    ]);
+
     try {
-      const result: AxiosResponse<any> = await axios.post(fullUrl, null, {
-        headers: headers,
-      });
-      const { status_code: statusCode, data } = result.data;
+      const audioChunks: Buffer[] = [];
+      for (const textChunk of formattedText) {
+        const fullUrl = `${this.apiUrl}/?text_speaker=${
+          args.voice ?? detectedLanguage
+        }&req_text=${textChunk}&speaker_map_type=0&aid=1233`;
 
-      this.createLog([
-        `Audio Language: ${detectedLanguage}`,
-        `Auto Detect Language: ${args.detectLanguage}`,
-        `Fetched Audio with Status Code: ${statusCode}`,
-      ]);
+        const result: AxiosResponse<any> = await axios.post(fullUrl, null, {
+          headers: headers,
+        });
+        const { status_code: statusCode, data } = result.data;
 
-      if (statusCode !== 0) {
-        throw new Error(this.handleError(statusCode));
+        if (statusCode !== 0) {
+          throw new Error(this.handleError(statusCode));
+        }
+
+        const audioChunk = Buffer.from(data.v_str, "base64");
+        audioChunks.push(audioChunk);
       }
 
+      const audioBuffer = Buffer.concat(audioChunks);
       const audioFilename = `${args.audioName ?? "gemini-speech"}.mp3`;
-      fs.writeFileSync(audioFilename, Buffer.from(data.v_str, "base64"));
+      fs.writeFileSync(audioFilename, audioBuffer);
       this.createLog(`Saved Audio with Name: ${audioFilename}`);
       return audioFilename;
     } catch (error) {
@@ -124,10 +130,19 @@ export class TextToSpeech {
    * @param text The text to be formatted.
    * @returns The formatted text.
    */
-  private formatText(text: string): string {
-    return text.replace(/(^([*-]\s*)|\s+)/gm, (_match, replacedText) =>
-      replacedText ? "" : "+"
-    );
+  private formatText(text: string): string[] {
+    const chunks: string[] = [];
+
+    while (text.length > 0) {
+      chunks.push(text.substring(0, Math.min(150, text.length)));
+      text = text.substring(150);
+    }
+
+    return chunks.map((chunk) => {
+      return chunk.replace(/^[*-]\s*|\s+/gm, (match) => {
+        return match === "*" || match === "-" ? "" : "+";
+      });
+    });
   }
 
   /**
