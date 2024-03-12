@@ -19,7 +19,7 @@ async function chat() {
     audioName: "myaudio",
     detectLanguage: true,
   });
-  const playAudio = audio.playAudio(botAudio|| "");
+  audio.playAudio(botAudio || "");
 }
 
 chat();

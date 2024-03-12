@@ -139,7 +139,7 @@ export class TextToSpeech {
     }
 
     return chunks.map((chunk) => {
-      return chunk.replace(/^[*-]\s*|\s+/gm, (match) => {
+      return chunk.replace(/(^[-*]\s*|\s+)/gm, (match) => {
         return match === "*" || match === "-" ? "" : "+";
       });
     });
