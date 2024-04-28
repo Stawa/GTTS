@@ -93,6 +93,7 @@ export class TextToSpeech {
     this.createLog([
       `Audio Language: ${detectedLanguage}`,
       `Auto Detect Language: ${args.detectLanguage}`,
+      `Formatted Text: ${formattedText}`
     ]);
 
     try {

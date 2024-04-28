@@ -1,3 +1,9 @@
+/**
+ * IMPORTANT NOTE! - April 28, 2024
+ * This example is not finished yet. An error may or may not show up.
+ * Please be patient and wait until we update them.
+ */
+
 import {
   AudioGemini,
   GoogleGemini,
@@ -12,7 +18,7 @@ const audio = new AudioGemini({ debugLog: true });
 
 async function chat() {
   const res = await gemini.chat(
-    "Coba jelaskan apa itu Honkai Star Rail? (max 300 length)" // Long answer takes a while.
+    "Could you explain what is Honkai Star Rail? (max 300 length)" // Long answer takes a while.
   );
   const botAudio = await textspeech.createSpeech({
     text: res,

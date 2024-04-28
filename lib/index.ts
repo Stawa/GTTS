@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2024 Stawa
+ * Copyright (c) 2024-present Stawa
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,10 @@
  * SOFTWARE.
  */
 
-export * from "./gemini";
-export * from "./tts";
-export * from "./enums";
-export * from "./speech/audio";
-export * from "./speech/voice";
+export * from "@lib/gemini";
+export * from "@lib/tts";
+export * from "@lib/enums";
+export * from "@lib/speech/audio";
+export * from "@lib/speech/voice";
+export * from "@speech/audio";
+export * from "@speech/voice";

@@ -19,9 +19,21 @@
     </a>
 </p>
 
-<h3> <span class="emoji">📌</span> Note </h3>
+<h3> <span class="emoji">📜</span> Table of Contents </h3>
 
-This project is being tested on Linux using the Ubuntu 23.10 x86_64 distribution. I'm not sure whether this will work on Windows or MacOS.
+1. <a href="#--how-it-works-"> <b>How It Works</b> </a>
+2. <a href="#--project-note-"> <b>Project Note</b> </a>
+3. <a href="#--project-installlation-"> <b>Project Installlation</b> </a>
+4. <a href="#--project-examples-"> <b>Project Examples</b> </a>
+5. <a href="#--author--"> <b>Project Author</b> </a>
+
+<h3> <span class="emoji">📌</span> How It Works </h3>
+
+<p> You may be wondering how this project works; it's actually simple. This was based on an example in [test/app.ts](https://github.com/Stawa/GTTS/blob/main/test/app.ts). So the first thing it will do is fetch our voice, and then it will call a function that sends a request to the Google Gemini API so we can receive an answer from the AI. Also, this is necessary; it can automatically play a TTS from the generated text. </p>
+
+<h3> <span class="emoji">📌</span> Project Note </h3>
+
+<p> This project is being tested on Linux using the Ubuntu 24.04 LTS x86_64 distribution. If you're on Windows, you can use WSL (Windows Subsystem Linux) to run SoX. In MacOS, I don't have any information about it since I don't use MacOS, but you can use any possible way to run SoX at least. </p>
 
 | Task                               | Priority | Complete | Status      |
 | ---------------------------------- | :------: | :------: | ----------- |
@@ -32,12 +44,6 @@ This project is being tested on Linux using the Ubuntu 23.10 x86_64 distribution
 | Implement an Audio Player          |   Low    | &check;  | Completed   |
 | Define Enums                       |   Low    | &check;  | Completed   |
 | Integrate Debugging                |   Low    | &check;  | Completed   |
-
-<h3> <span class="emoji">📜</span> Table of Contents </h3>
-
-1. <a href="#--project-installlation-"> <b>Project Installlation</b> </a>
-2. <a href="#--project-examples-"> <b>Project Examples</b> </a>
-3. <a href="#--author--"> <b>Project Author</b> </a>
 
 <h3> <span class="emoji">📦</span> Project Installlation </h4>
 

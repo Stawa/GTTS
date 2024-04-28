@@ -1,14 +1,14 @@
 {
-  "name": "@stawa/gemini-text-to-speech",
+  "name": "@stawa/gtts",
   "author": "Stawa",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "This project converts written material into speech by using Google AI (Gemini) for text creation or internet searches.",
   "module": "index.ts",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types",
   "license": "MIT",
-  "homepage": "https://github.com/Stawa/Gemini-Text-To-Speech",
+  "homepage": "https://github.com/Stawa/GTTS",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -18,10 +18,12 @@
   },
   "os": [
     "darwin",
-    "linux"
+    "linux",
+    "win32"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "tsx": "^4.7.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -31,7 +33,6 @@
     "@google/generative-ai": "^0.2.1",
     "@iamtraction/google-translate": "^2.0.1",
     "axios": "^1.6.7",
-    "music-metadata": "^7.14.0",
-    "speech-detector": "^1.0.0"
+    "music-metadata": "^7.14.0"
   }
 }

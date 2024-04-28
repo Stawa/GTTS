@@ -1,6 +1,6 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "child_process";
 import fs from "fs";
-import axios, { type AxiosResponse } from "axios";
+import axios from "axios";
 import querystring from "querystring";
 
 /**
@@ -65,7 +65,7 @@ export class VoiceRecognition {
     this.debugLog = components?.debugLog ?? false;
     this.debugLogged = false;
     this.apiUrl = "https://www.google.com/speech-api/v2/recognize";
-    this.apiKey = components?.apiKey ?? process.env.TIKTOK_SESSION_ID;
+    this.apiKey = components?.apiKey ?? process.env.GOOGLE_SPEECH_API_KEY;
   }
 
   /**
