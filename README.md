@@ -14,7 +14,7 @@
     </a>
     <a href="https://bun.sh/"><img src=https://img.shields.io/badge/Powered%20by%20Bun-black?style=flat&logo=bun&logoColor=white>
     </a>
-    <a href="https://stawa.github.io/Gemini-Text-To-Speech/"><img alt="Documentation" src="https://img.shields.io/website?url=https://stawa.github.io/Gemini-Text-To-Speech&up_message=Available&up_color=1F51FF&down_color=critical&&down_message=Unavailable&style=flat&logo=github&label=Documentation&labelColor=black">
+    <a href="https://stawa.github.io/GTTS/"><img alt="Documentation" src="https://img.shields.io/website?url=https://stawa.github.io/GTTS/&up_message=Available&up_color=1F51FF&down_color=critical&&down_message=Unavailable&style=flat&logo=github&label=Documentation&labelColor=black">
     <a href="https://sonarcloud.io/project/overview?id=Stawa_Gemini-Text-To-Speech"><img src="https://sonarcloud.io/api/project_badges/measure?project=Stawa_Gemini-Text-To-Speech&metric=reliability_rating" alt="SonarCloud" /></a>
     </a>
 </p>
