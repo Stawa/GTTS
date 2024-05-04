@@ -26,9 +26,10 @@
     "tsx": "^4.7.1"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@deepgram/sdk": "^3.3.0",
     "@google-cloud/text-to-speech": "^5.1.0",
     "@google/generative-ai": "^0.8.0",
     "@iamtraction/google-translate": "^2.0.1",
