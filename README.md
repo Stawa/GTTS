@@ -33,7 +33,7 @@ You may be wondering how this project works; it's actually simple. This was base
 
 <h3> <span class="emoji">📌</span> Project Note </h3>
 
-<p> This project is being tested on Linux using the Ubuntu 24.04 LTS x86_64 distribution. If you're on Windows, you can use WSL (Windows Subsystem Linux) to run SoX. In MacOS, I don't have any information about it since I don't use MacOS, but you can use any possible way to run SoX at least. </p>
+<p> This project is being tested on Linux using the Ubuntu 24.04 LTS x86_64 distribution. For windows users you can install SoX in SourceForge. In MacOS, I don't have any information about it since I don't use MacOS, but you can use any possible way to run SoX at least. </p>
 
 | Task                               | Priority | Complete | Status      |
 | ---------------------------------- | :------: | :------: | ----------- |
@@ -51,16 +51,21 @@ You may be wondering how this project works; it's actually simple. This was base
 
 1. SoX
    - `sudo apt-get install sox`
+   - [Windows Users (SourceForge)](https://sourceforge.net/projects/sox/)
 2. libsox-fmt-all
    - `sudo apt-get install libsox-fmt-all`
+   - `// Optional for windows`
+3. FFmpeg
+   - `choco install ffmpeg`
+   - `sudo apt install ffmpeg`
 
 <p> After installing the necessary libraries, proceed to install the repository by using the following commands: </p>
 
 ```bash
 # npm
-$ npm install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
+$ npm install git+https://github.com/Stawa/GTTS.git
 # Bun
-$ bun install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
+$ bun install git+https://github.com/Stawa/GTTS.git
 ```
 
 <h3> <span class="emoji">📄</span> Project Examples </h4>
@@ -71,8 +76,10 @@ $ bun install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
    - This key can be obtained from [Google Cloud](https://console.cloud.google.com/apis/library/generativelanguage.googleapis.com).
 2. TikTok SessionID (`lib.TextToSpeech`)
    - This SessionID can be obtained from [TikTok](https://www.tiktok.com/) cookies.
-3. Speech API Key (`lib.VoiceRecognition`)
+3. Google Speech API Key (`lib.VoiceRecognition.fetchTranscriptGoogle`)
    - This key can be obtained from [Chromium API Key](https://www.chromium.org/developers/how-tos/api-keys/).
+4. Deepgram API Key (`lib.VoiceRecognition.fetchTrascriptDeepgram`)
+   - This key can be obtained from [Deepgram](https://console.deepgram.com/)
 
 <p> If you are using <code>.env</code>, you can use these following example of our <code>.env</code> file: </p>
 
@@ -80,12 +87,13 @@ $ bun install git+https://github.com/Stawa/Gemini-Text-To-Speech.git
 GEMINI_API_KEY=XXXXXXXXXXXXXXXXXXXXXXX
 TIKTOK_SESSION_ID=XXXXXXXXXXXXXXXXXXXX
 GOOGLE_SPEECH_API_KEY=XXXXXXXXXXXXXXXX
+DEEPGRAM_API_KEY=XXXXXXXXXXXXXXXXXXXXX
 ```
 
 <p> This is an example of how you get a generated response from the Google Gemini API; it only takes one function: </p>
 
 ```ts
-import { GoogleGemini } from "@stawa/gemini-text-to-speech";
+import { GoogleGemini } from "@stawa/gtts";
 
 const google = new GoogleGemini({
    apiKey: "XXXXX", // No need if you already put it on .env file.
@@ -105,4 +113,4 @@ app();
 | Developer Avatar                                                                                 | GitHub                                          |
 | ------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
 | <img src="https://avatars.githubusercontent.com/u/69102292" alt="Developer Avatar" width="50"/>  | [Stawa](https://github.com/Stawa)               |
-| <img src="https://avatars.githubusercontent.com/u/121237326" alt="Developer Avatar" width="50"/> | [TeenYsMASTER](https://github.com/TeenYsMASTER) |
+| <img src="https://avatars.githubusercontent.com/u/168246947" alt="Developer Avatar" width="50"/> | [TeenYs](https://github.com/TeenYsDaMan) |
