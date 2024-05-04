@@ -1,4 +1,4 @@
-import { spawn, type ChildProcessWithoutNullStreams } from "child_process";
+import { exec, type ChildProcess } from "child_process";
 import mm, { type IAudioMetadata } from "music-metadata";
 
 /**
@@ -94,11 +94,9 @@ export class AudioGemini {
    * @param filename The filename of the audio file to be played.
    */
   public playAudio(filename: string): void {
-    const command: ChildProcessWithoutNullStreams = spawn("/usr/bin/play", [
-      filename,
-    ]);
+    const command: ChildProcess = exec(`ffplay -nodisp ${filename}`);
 
-    command.stderr.on("data", async (_data) => {
+    command.stderr?.on("data", async (_data) => {
       if (this.debugLog && !this.debugLogged) {
         const parseAudio = await mm.parseFile(filename);
         const format: AudioDetails = this.extractAudioFormat(parseAudio);
