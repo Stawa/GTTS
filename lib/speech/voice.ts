@@ -74,9 +74,12 @@ export class VoiceRecognition {
 
   /**
    * Performs voice recognition on the audio file specified by the filename.
-   * @param filename The filename of the audio file for voice recognition.
+   * @param filename The temp filename of the audio file for voice recognition.
    */
-  public voiceRecognition(filename: string): void {
+  public voiceRecognition(
+    filename: string,
+    callback: (result: string | void) => void
+  ): string | void {
     const command: ChildProcess = exec(
       `sox -t waveaudio default --encoding signed-integer --bits 16 --rate 16000 ${filename}.wav silence 1 0.1 5% 1 3.0 5%`
     );
@@ -92,7 +95,7 @@ export class VoiceRecognition {
 
     command.on("exit", (code) => {
       this.createLog(`VoiceRecognition Closed with Code: ${code}`);
-      if (code == 0) return true;
+      if (code == 0) callback(`${filename}.wav`);
     });
   }
 
@@ -187,8 +190,7 @@ export class VoiceRecognition {
       info
         .filter((line) => logPrefixRegex.test(line))
         .forEach((line) => {
-          const match = logPrefixRegex.exec(line);
-          match && (logMessage += `* ${match[0]}\n`);
+          logMessage += `* ${line}\n`;
         });
       this.debugLogged = true;
     }
