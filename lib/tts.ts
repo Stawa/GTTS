@@ -93,7 +93,7 @@ export class TextToSpeech {
     this.createLog([
       `Audio Language: ${detectedLanguage}`,
       `Auto Detect Language: ${args.detectLanguage}`,
-      `Formatted Text: ${formattedText}`
+      `Formatted Text: ${formattedText}`,
     ]);
 
     try {
@@ -132,17 +132,17 @@ export class TextToSpeech {
    * @returns The formatted text.
    */
   private formatText(text: string): string[] {
+    const words: string[] = text.split(/\s+/);
     const chunks: string[] = [];
 
-    while (text.length > 0) {
-      chunks.push(text.substring(0, Math.min(150, text.length)));
-      text = text.substring(150);
+    for (let i = 0; i < words.length; i += 20) {
+      chunks.push(words.slice(i, i + 20).join(" "));
     }
 
     return chunks.map((chunk) => {
-      return chunk.replace(/(^[-*]\s*|\s+)/gm, (match) => {
-        return match === "*" || match === "-" ? "" : "+";
-      });
+      const cleanedChunk = chunk.replace(/[^a-zA-Z ]/g, "");
+      const spaceReplaced = cleanedChunk.replace(/\s+/g, "+");
+      return spaceReplaced.replace(/[-*]/g, "");
     });
   }
 
