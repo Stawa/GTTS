@@ -27,7 +27,7 @@
 4. <a href="#--project-examples-"> <b>Project Examples</b> </a>
 5. <a href="#--author--"> <b>Project Author</b> </a>
 
-<h3> <span class="emoji">📌</span> How It Works </h3>
+<h3> <span class="emoji">❓</span> How It Works </h3>
 
 You may be wondering how this project works; it's actually simple. This was based on an example in [test/app.ts](https://github.com/Stawa/GTTS/blob/main/test/app.ts). So the first thing it will do is fetch our voice, and then it will call a function that sends a request to the Google Gemini API so we can receive an answer from the AI. Also, this is necessary; it can automatically play a TTS from the generated text.
 
