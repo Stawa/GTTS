@@ -94,7 +94,7 @@ export class AudioGemini {
    * @param filename The filename of the audio file to be played.
    */
   public playAudio(filename: string): void {
-    const command: ChildProcess = exec(`ffplay -nodisp ${filename}`);
+    const command: ChildProcess = exec(`ffplay -autoexit -nodisp ${filename}`);
 
     command.stderr?.on("data", async (_data) => {
       if (this.debugLog && !this.debugLogged) {
