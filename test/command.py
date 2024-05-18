@@ -14,8 +14,8 @@ logger = logging.getLogger()
 
 
 class VoiceRecognition:
-    def __init__(self, apiKey: str) -> None:
-        self.client = DeepgramClient(api_key=apiKey)
+    def __init__(self, api_key: str) -> None:
+        self.client = DeepgramClient(api_key=api_key)
         self.finalized_transcriptions = []
 
     def run(self, language: str = "en-US", model: str = "nova-2") -> None:
@@ -122,6 +122,6 @@ class VoiceRecognition:
 
 
 if __name__ == "__main__":
-    api_key = "74f79b93ef35b90fffd5e5840e2fc234c374504c"
+    api_key = "XXXXXXXXXXXX"
     voice_recognition = VoiceRecognition(api_key)
     voice_recognition.run()
