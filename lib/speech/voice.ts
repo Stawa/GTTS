@@ -12,7 +12,7 @@ interface STTComponents {
    * A boolean flag indicates whether debug logging is enabled.
    */
   debugLog?: boolean;
-  apiKey?: string;
+  apiKey: string;
 }
 
 /**
@@ -81,7 +81,7 @@ export class VoiceRecognition {
     callback: (result: string | void) => void
   ): string | void {
     const command: ChildProcess = exec(
-      `sox -t waveaudio default --encoding signed-integer --bits 16 --rate 16000 ${filename}.wav silence 1 0.1 5% 1 3.0 5%`
+      `sox -t waveaudio default --encoding signed-integer --bits 16 --rate 16000 ${filename}.wav silence 1 0.1 5% 1 1.0 5%`
     );
 
     command.stderr?.on("data", (data) => {
@@ -108,7 +108,7 @@ export class VoiceRecognition {
     components: GoogleSpeechComponents
   ): Promise<TranscriptResult | null> {
     const apiUrl = "https://www.google.com/speech-api/v2/recognize";
-    const apiKey = components.apiKey || process.env.GOOGLE_SPEECH_API_KEY;
+    const apiKey = components.apiKey;
     const params = querystring.stringify({
       output: "json",
       lang: components.language,
@@ -130,7 +130,7 @@ export class VoiceRecognition {
   public async fetchTrascriptDeepgram(
     components: DeepgramSpeechComponents
   ): Promise<SyncPrerecordedResponse> {
-    const apiKey = components.apiKey || process.env.DEEPGRAM_API_KEY;
+    const apiKey = components.apiKey;
     const client = apiKey
       ? createClient(apiKey)
       : (() => {
@@ -143,6 +143,7 @@ export class VoiceRecognition {
       {
         language: components.language,
         model: components.model,
+        detect_language: true,
         smart_format: true,
       }
     );

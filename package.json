@@ -1,7 +1,7 @@
 {
   "name": "@stawa/gtts",
   "author": "Stawa",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "This project converts written material into speech by using Google AI (Gemini) for text creation or internet searches.",
   "module": "index.ts",
   "type": "module",

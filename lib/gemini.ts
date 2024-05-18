@@ -7,7 +7,7 @@ interface GeminiComponents {
   /**
    * API key for accessing the Google Generative AI service.
    */
-  apiKey?: string;
+  apiKey: string;
   /**
    * A boolean flag indicates whether debug logs should be enabled.
    */
@@ -41,7 +41,7 @@ export class GoogleGemini {
    * @param components Additional components to set the GoogleGemini instance setup.
    */
   constructor(components?: GeminiComponents) {
-    this.apiKey = components?.apiKey ?? process.env.GEMINI_API_KEY;
+    this.apiKey = components?.apiKey;
     this.debugLog = components?.debugLog ?? false;
     this.client = this.apiKey
       ? new GoogleGenerativeAI(this.apiKey)

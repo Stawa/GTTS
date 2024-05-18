@@ -35,15 +35,15 @@ You may be wondering how this project works; it's actually simple. This was base
 
 <p> This project is being tested on Linux using the Ubuntu 24.04 LTS x86_64 distribution. For windows users you can install SoX in SourceForge. In MacOS, I don't have any information about it since I don't use MacOS, but you can use any possible way to run SoX at least. </p>
 
-| Task                               | Priority | Complete | Status      |
-| ---------------------------------- | :------: | :------: | ----------- |
-| Implement Gemini Chat              |   High   | &check;  | Completed   |
-| Develop Voice Recognition          |   High   | &cross;  | In Progress |
-| Implement Audio Language Detection |   High   | &cross;  | In Progress |
-| Implement Text Language Detection  |  Medium  | &check;  | Completed   |
-| Implement an Audio Player          |   Low    | &check;  | Completed   |
-| Define Enums                       |   Low    | &check;  | Completed   |
-| Integrate Debugging                |   Low    | &check;  | Completed   |
+| Task                               | Priority | Complete | Status    |
+| ---------------------------------- | :------: | :------: | --------- |
+| Implement Gemini Chat              |   High   | &check;  | Completed |
+| Develop Voice Recognition          |   High   | &check;  | Completed |
+| Implement Audio Language Detection |   High   | &check;  | Completed |
+| Implement Text Language Detection  |  Medium  | &check;  | Completed |
+| Implement an Audio Player          |   Low    | &check;  | Completed |
+| Define Enums                       |   Low    | &check;  | Completed |
+| Integrate Debugging                |   Low    | &check;  | Completed |
 
 <h3> <span class="emoji">📦</span> Project Installlation </h4>
 
@@ -81,22 +81,13 @@ $ bun install git+https://github.com/Stawa/GTTS.git
 4. Deepgram API Key (`lib.VoiceRecognition.fetchTrascriptDeepgram`)
    - This key can be obtained from [Deepgram](https://console.deepgram.com/)
 
-<p> If you are using <code>.env</code>, you can use these following example of our <code>.env</code> file: </p>
-
-```bash
-GEMINI_API_KEY=XXXXXXXXXXXXXXXXXXXXXXX
-TIKTOK_SESSION_ID=XXXXXXXXXXXXXXXXXXXX
-GOOGLE_SPEECH_API_KEY=XXXXXXXXXXXXXXXX
-DEEPGRAM_API_KEY=XXXXXXXXXXXXXXXXXXXXX
-```
-
 <p> This is an example of how you get a generated response from the Google Gemini API; it only takes one function: </p>
 
 ```ts
 import { GoogleGemini } from "@stawa/gtts";
 
 const google = new GoogleGemini({
-   apiKey: "XXXXX", // No need if you already put it on .env file.
+   apiKey: "XXXXX",
    debugLog: true;
 })
 
@@ -110,7 +101,7 @@ app();
 
 <h3> <span class="emoji">🛠</span> Project Author </h3>
 
-| Developer Avatar                                                                                 | GitHub                                          |
-| ------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
-| <img src="https://avatars.githubusercontent.com/u/69102292" alt="Developer Avatar" width="50"/>  | [Stawa](https://github.com/Stawa)               |
+|                                         Author's Avatar                                          |             Author's GitHub              |
+| :----------------------------------------------------------------------------------------------: | :--------------------------------------: |
+| <img src="https://avatars.githubusercontent.com/u/69102292" alt="Developer Avatar" width="50"/>  |    [Stawa](https://github.com/Stawa)     |
 | <img src="https://avatars.githubusercontent.com/u/168246947" alt="Developer Avatar" width="50"/> | [TeenYs](https://github.com/TeenYsDaMan) |
