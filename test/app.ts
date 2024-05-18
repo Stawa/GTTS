@@ -1,7 +1,7 @@
 /**
- * IMPORTANT NOTE! - April 28, 2024
- * This example is not finished yet. An error may or may not show up.
- * Please be patient and wait until we update them.
+ * IMPORTANT NOTE! - May 18, 2024
+ * This examples works without command like "Hey Google" and then we start talking.
+ * If you need to use a voice command, you can use python on command.py
  */
 
 import {
@@ -11,21 +11,32 @@ import {
   VoiceRecognition,
 } from "../lib";
 
-const gemini = new GoogleGemini({ debugLog: true });
+const gemini = new GoogleGemini({ apiKey: "XXXXXXXXXXXXX", debugLog: true });
 const textspeech = new TextToSpeech({ debugLog: true });
 const voice = new VoiceRecognition({ debugLog: true });
 const audio = new AudioGemini({ debugLog: true });
 
-async function chat() {
-  const res = await gemini.chat(
-    "Could you explain what is Honkai Star Rail? (max 300 length)" // Long answer takes a while.
-  );
+async function voiceRecognition() {
+  voice.voiceRecognition("Test", async (result) => {
+    const test = await voice.fetchTrascriptDeepgram({
+      model: "nova-2",
+      language: "id",
+      audioFile: result ? result : "Test",
+      apiKey: "XXXXXXXXXXXXXXXXX",
+    });
+    console.log(test.results.channels[0].alternatives[0].transcript);
+    await chat(test.results.channels[0].alternatives[0].transcript);
+  });
+}
+
+async function chat(text: string) {
+  const res = await gemini.chat(text);
   const botAudio = await textspeech.createSpeech({
     text: res,
     audioName: "myaudio",
     detectLanguage: true,
   });
-  audio.playAudio(botAudio || "");
+  audio.playAudio(botAudio);
 }
 
-chat();
+voiceRecognition();
