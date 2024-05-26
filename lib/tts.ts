@@ -59,7 +59,6 @@ export class TextToSpeech {
    * @public
    */
   public debugLog: boolean;
-
   /**
    * Constructs a new TextToSpeech instance.
    * @param components Optional components to initialize the TextToSpeech instance.
@@ -67,7 +66,7 @@ export class TextToSpeech {
   constructor(components?: TTSComponents) {
     this.apiUrl =
       "https://api16-normal-v6.tiktokv.com/media/api/text/speech/invoke";
-    this.sessionId = components?.sessionId ?? process.env.TIKTOK_SESSION_ID;
+    this.sessionId = components?.sessionId;
     this.debugLog = components?.debugLog ?? false;
   }
 
