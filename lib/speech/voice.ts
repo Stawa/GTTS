@@ -5,6 +5,11 @@ import axios from "axios";
 import querystring from "querystring";
 
 /**
+ * Defines the type for the player.
+ */
+type Player = "soxWindows" | "soxLinux";
+
+/**
  * Interface for the components that can be passed to the VoiceRecognition constructor.
  */
 interface STTComponents {
@@ -77,12 +82,15 @@ export class VoiceRecognition {
    * @param filename The temp filename of the audio file for voice recognition.
    */
   public voiceRecognition(
+    player: Player,
     filename: string,
     callback: (result: string | void) => void
   ): string | void {
-    const command: ChildProcess = exec(
-      `sox -t waveaudio default --encoding signed-integer --bits 16 --rate 16000 ${filename}.wav silence 1 0.1 5% 1 1.0 5%`
-    );
+    const playerCommand: Record<Player, string> = {
+      soxWindows: `sox -t waveaudio default --encoding signed-integer --bits 16 --rate 16000 ${filename}.wav silence 1 0.1 5% 1 1.0 5%`,
+      soxLinux: `sox -t alsa default --encoding signed-integer --bits 16 --rate 16000 ${filename}.flac silence 1 0.1 5% 1 3.0 5%`,
+    };
+    const command: ChildProcess = exec(playerCommand[player]);
 
     command.stderr?.on("data", (data) => {
       if (this.debugLog && !this.debugLogged) {

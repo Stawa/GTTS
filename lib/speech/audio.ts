@@ -2,6 +2,11 @@ import { exec, type ChildProcess } from "child_process";
 import mm, { type IAudioMetadata } from "music-metadata";
 
 /**
+ * Defines the type for the player.
+ */
+type Player = "ffmpeg";
+
+/**
  * Interface for the components that can be passed to the AudioGemini constructor.
  * @interface
  */
@@ -93,8 +98,12 @@ export class AudioGemini {
    * Plays the audio file specified by the filename.
    * @param filename The filename of the audio file to be played.
    */
-  public playAudio(filename: string): void {
-    const command: ChildProcess = exec(`ffplay -autoexit -nodisp ${filename}`);
+  public playAudio(player: Player, filename: string): void {
+    const playerCommand: Record<Player, string> = {
+      ffmpeg: `ffplay -autoexit -nodisp ${filename}`,
+    };
+
+    const command: ChildProcess = exec(playerCommand[player]);
 
     command.stderr?.on("data", async (_data) => {
       if (this.debugLog && !this.debugLogged) {
