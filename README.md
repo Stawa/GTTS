@@ -25,7 +25,7 @@
 2. <a href="#--project-note-"> <b>Project Note</b> </a>
 3. <a href="#--project-installlation-"> <b>Project Installlation</b> </a>
 4. <a href="#--project-examples-"> <b>Project Examples</b> </a>
-5. <a href="#--author--"> <b>Project Author</b> </a>
+5. <a href="#--contributors--"> <b>Contributors</b> </a>
 
 <h3> <span class="emoji">❓</span> How It Works </h3>
 
@@ -99,9 +99,8 @@ async function app() {
 app();
 ```
 
-<h3> <span class="emoji">🛠</span> Project Author </h3>
+<h3> <span class="emoji">👥</span> Contributors </h3>
 
-|                                         Author's Avatar                                          |             Author's GitHub              |
-| :----------------------------------------------------------------------------------------------: | :--------------------------------------: |
-| <img src="https://avatars.githubusercontent.com/u/69102292" alt="Developer Avatar" width="50"/>  |    [Stawa](https://github.com/Stawa)     |
-| <img src="https://avatars.githubusercontent.com/u/168246947" alt="Developer Avatar" width="50"/> | [TeenYs](https://github.com/TeenYsDaMan) |
+<a href="https://github.com/stawa/gtts/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=stawa/gtts" />
+</a>
