@@ -10,7 +10,7 @@ interface TTSComponents {
   /**
    * Session ID for accessing the TikTok text-to-speech API.
    */
-  sessionId?: string;
+  sessionId: string;
   /**
    * A boolean flag indicates whether debug logs should be enabled.
    */

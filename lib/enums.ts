@@ -1,6 +1,7 @@
 export enum VoiceSpeaker {
   // English
   GameOn = "en_male_jomboy",
+  FemaleEnglishUS = "en_us_001",
   Jessie = "en_us_002",
   Wacky = "en_male_funny",
   Empathetic = "en_female_samc",
