@@ -7,7 +7,7 @@ assignees: Stawa
 
 ---
 
-**Does this feature resolve any specific issue??**
+**Does this feature resolve any specific issue?**
 What requirement or condition does this feature try to address?
 
 **Provide an explanation of the feature and its proposed use.**
