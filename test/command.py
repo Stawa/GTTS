@@ -4,8 +4,11 @@ from deepgram import (
     LiveOptions,
     Microphone,
 )
+from dotenv import load_dotenv
 import os
 import logging
+
+load_dotenv()
 
 logging.basicConfig(
     format="[VoiceRecognition Deepgram]\n* %(message)s", level=logging.INFO
@@ -14,9 +17,10 @@ logger = logging.getLogger()
 
 
 class VoiceRecognition:
-    def __init__(self, api_key: str) -> None:
+    def __init__(self, phrases: list, api_key: str) -> None:
         self.client = DeepgramClient(api_key=api_key)
         self.finalized_transcriptions = []
+        self.phrases = phrases
 
     def run(self, language: str = "en-US", model: str = "nova-2") -> None:
         try:
@@ -49,7 +53,7 @@ class VoiceRecognition:
 
             self.create_log("Press Enter to stop recording...")
 
-            if not dg_connection.start(options, addons={"no_delay": "true"}):
+            if not dg_connection.start(options, addons={"no_delay": True}):
                 self.create_log("Failed to connect to Deepgram")
                 return
 
@@ -76,14 +80,12 @@ class VoiceRecognition:
             return
         if result.is_final:
             self.finalized_transcriptions.append(sentence.lower())
-            if "hey, vera" in sentence.lower() or "hey vera" in sentence.lower():
+            if any(phrase in sentence.lower() for phrase in self.phrases):
                 self.create_log("INFO: Speech is detected...")
                 os.system("bun run app.ts")
                 os.abort()
             else:
-                self.create_log(
-                    "INFO: Utterance does not contain 'Hey, Vera' or 'hey vera'."
-                )
+                self.create_log("INFO: Utterance does not contain any phrases.")
                 self.finalized_transcriptions = []
         else:
             self.create_log(f"Interim Results: {sentence}")
@@ -96,7 +98,7 @@ class VoiceRecognition:
     def on_speech_started(self, *args, **kwargs):
         self.create_log("Speech Status: Speech Started")
 
-    def on_utterance_end(self, utterance_end, **kwargs):
+    def on_utterance_end(self, *args, **kwargs):
         if len(self.finalized_transcriptions) > 0:
             utterance = " ".join(self.finalized_transcriptions)
             self.create_log(f"Utterance End: {utterance}")
@@ -122,6 +124,7 @@ class VoiceRecognition:
 
 
 if __name__ == "__main__":
-    api_key = "XXXXXXXXXXXX"
-    voice_recognition = VoiceRecognition(api_key)
+    voice_command = ["hey, bot", "hey bot"]
+    api_key = os.getenv("DEEPGRAM_API_KEY")
+    voice_recognition = VoiceRecognition(voice_command, api_key)
     voice_recognition.run()
