@@ -1,4 +1,4 @@
-export enum VoiceSpeaker {
+export enum TikTokVoiceSpeaker {
   // English
   GameOn = "en_male_jomboy",
   FemaleEnglishUS = "en_us_001",
@@ -117,4 +117,19 @@ export enum VoiceSpeaker {
   // Vietnamese
   VietnameseFemale = "BV074_streaming",
   VietnameseMale = "BV075_streaming",
+}
+
+export enum DeepgramVoiceSpeaker {
+  Asteria = "aura-asteria-en", // American, female
+  Orpheus = "aura-orpheus-en", // American, male
+  Angus = "aura-angus-en", // Irish, male
+  Arcas = "aura-arcas-en", // American, male
+  Athena = "aura-athena-en", // British, female
+  Helios = "aura-helios-en", // British, male
+  Hera = "aura-hera-en", // American, female
+  Luna = "aura-luna-en", // American, female
+  Orion = "aura-orion-en", // American, male
+  Perseus = "aura-perseus-en", // American, male
+  Stella = "aura-stella-en", // American, female
+  Zeus = "aura-zeus-en", // American, male
 }

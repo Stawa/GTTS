@@ -88,7 +88,7 @@ import { GoogleGemini } from "@stawa/gtts";
 
 const google = new GoogleGemini({
    apiKey: "XXXXX",
-   debugLog: true;
+   logger: true;
 })
 
 async function app() {

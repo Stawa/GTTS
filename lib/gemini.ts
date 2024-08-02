@@ -9,9 +9,13 @@ interface GeminiComponents {
    */
   apiKey: string;
   /**
-   * A boolean flag indicates whether debug logs should be enabled.
+   * Model type to be used with the Google Generative AI service.
    */
-  debugLog?: boolean;
+  models: "gemini-1.5-pro" | "gemini-1.5-flash" | "gemini-1.0-pro";
+  /**
+   * A boolean flag indicates whether logger should be enabled.
+   */
+  logger?: boolean;
 }
 
 /**
@@ -32,26 +36,25 @@ export class GoogleGemini {
    */
   public apiKey: string | undefined;
   /**
-   * A boolean flag indicating whether debug logs are enabled.
+   * A boolean flag indicating whether logger are enabled.
    */
-  public debugLog: boolean;
+  public logger: boolean;
 
   /**
    * Constructs a new GoogleGemini instance.
    * @param components Additional components to set the GoogleGemini instance setup.
    */
   constructor(components?: GeminiComponents) {
-    this.apiKey = components?.apiKey;
-    this.debugLog = components?.debugLog ?? false;
-    this.client = this.apiKey
-      ? new GoogleGenerativeAI(this.apiKey)
-      : (() => {
-          console.error(
-            "GEMINI_API_KEY is missing. Please provide a valid API key."
-          );
-          process.exit(1);
-        })();
-    this.model = this.client.getGenerativeModel({ model: "gemini-pro" });
+    if (!components?.apiKey) {
+      throw new Error("API key is missing. Please provide a valid API key.");
+    }
+
+    this.apiKey = components.apiKey;
+    this.logger = components.logger ?? false;
+    this.client = new GoogleGenerativeAI(this.apiKey);
+    this.model = this.client.getGenerativeModel({
+      model: components.models,
+    });
   }
 
   /**
@@ -70,11 +73,11 @@ export class GoogleGemini {
   }
 
   /**
-   * When debug logging is enabled, creates a debug log using the information provided.
+   * When logger is enabled, creates a logger using the information provided.
    * @param info Information to be logged. It can be a string or an array of strings.
    */
   private createLog(info: string[] | string): void {
-    if (!this.debugLog) return;
+    if (!this.logger) return;
 
     const prefix =
       typeof info === "string"

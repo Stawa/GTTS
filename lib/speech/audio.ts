@@ -12,16 +12,16 @@ type Player = "ffmpeg";
  */
 interface AudioComponents {
   /**
-   * A boolean flag indicates whether debug logging is enabled.
+   * A boolean flag indicates whether logger is enabled.
    */
-  debugLog?: boolean;
+  logger?: boolean;
 }
 
 /**
  * Represents details about the audio file.
  * @interface
  */
-interface AudioDetails {
+export interface AudioDetails {
   /**
    * The types of tags associated with the audio file.
    */
@@ -74,24 +74,24 @@ interface AudioDetails {
  */
 export class AudioGemini {
   /**
-   * A boolean flag indicating whether debug logs are enabled.
+   * A boolean flag indicating whether logger are enabled.
    * @public
    */
-  public debugLog: boolean;
+  public logger: boolean;
   /**
-   * A boolean flag indicates whether debug logs have been created to prevent double logs.
-   * If set to true, debug logs have already been created for the current instance.
+   * A boolean flag indicates whether logger have been created to prevent double logs.
+   * If set to true, logger have already been created for the current instance.
    * @private
    */
-  private debugLogged: boolean;
+  private logSent: boolean;
 
   /**
    * Constructs a new AudioGemini instance.
    * @param components Optional components to initialize the AudioGemini instance.
    */
   constructor(components?: AudioComponents) {
-    this.debugLog = components?.debugLog ?? false;
-    this.debugLogged = false;
+    this.logger = components?.logger ?? false;
+    this.logSent = false;
   }
 
   /**
@@ -106,7 +106,7 @@ export class AudioGemini {
     const command: ChildProcess = exec(playerCommand[player]);
 
     command.stderr?.on("data", async (_data) => {
-      if (this.debugLog && !this.debugLogged) {
+      if (this.logger && !this.logSent) {
         const parseAudio = await mm.parseFile(filename);
         const format: AudioDetails = this.extractAudioFormat(parseAudio);
         this.createLog(format);
@@ -114,14 +114,14 @@ export class AudioGemini {
     });
 
     command.on("close", (code) => {
-      if (this.debugLog) {
+      if (this.logger) {
         this.createLog(`AudioGemini Closed with Code: ${code}`);
       }
     });
   }
 
   /**
-   * Creates debug logs with the provided audio details or string information.
+   * Creates logger with the provided audio details or string information.
    * @param info Information about the audio file or a string message to be logged.
    */
   private createLog(info: AudioDetails | string): void {
@@ -139,9 +139,8 @@ export class AudioGemini {
       duration: `* Duration: ${this.formatDuration(format.duration)}`,
     };
 
-    !this.debugLogged &&
-      Object.values(log).forEach((entry) => console.log(entry));
-    this.debugLogged = true;
+    !this.logSent && Object.values(log).forEach((entry) => console.log(entry));
+    this.logSent = true;
   }
 
   /**
@@ -150,13 +149,30 @@ export class AudioGemini {
    * @returns The formatted duration string.
    */
   private formatDuration(duration: number): string {
-    if (!duration) return "N/A";
+    if (duration === undefined || duration === null || isNaN(duration))
+      return "N/A";
+
     const hours = Math.floor(duration / 3600);
     const minutes = Math.floor((duration % 3600) / 60);
-    const seconds = duration % 60;
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toFixed(2)}`;
+    const seconds = Math.floor(duration % 60);
+
+    let result = "";
+
+    if (hours > 0) {
+      result += `${hours} Hour${hours > 1 ? "s" : ""}`;
+    }
+
+    if (minutes > 0) {
+      if (result) result += ", ";
+      result += `${minutes} Minute${minutes > 1 ? "s" : ""}`;
+    }
+
+    if (seconds > 0 || result === "") {
+      if (result) result += ", ";
+      result += `${seconds} Second${seconds > 1 ? "s" : ""}`;
+    }
+
+    return result;
   }
 
   /**

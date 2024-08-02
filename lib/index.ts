@@ -25,3 +25,4 @@ export * from "./tts";
 export * from "./enums";
 export * from "./speech/audio";
 export * from "./speech/voice";
+export * from "./text/summarize";

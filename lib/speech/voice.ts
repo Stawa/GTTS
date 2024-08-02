@@ -14,10 +14,9 @@ type Player = "soxWindows" | "soxLinux";
  */
 interface STTComponents {
   /**
-   * A boolean flag indicates whether debug logging is enabled.
+   * A boolean flag indicates whether logger is enabled.
    */
-  debugLog?: boolean;
-  apiKey: string;
+  logger?: boolean;
 }
 
 /**
@@ -52,16 +51,16 @@ interface TranscriptResult {
  */
 export class VoiceRecognition {
   /**
-   * A boolean flag indicating whether debug logs are enabled.
+   * A boolean flag indicating whether logger are enabled.
    * @public
    */
-  public debugLog: boolean;
+  public logger: boolean;
   /**
-   * A boolean flag indicates whether debug logs have been created to prevent double logs.
-   * If set to true, debug logs have already been created for the current instance.
+   * A boolean flag indicates whether logger have been created to prevent double logs.
+   * If set to true, logger have already been created for the current instance.
    * @private
    */
-  private debugLogged: boolean;
+  private logSent: boolean;
   /**
    * API key for accessing the Google Speech service.
    */
@@ -72,9 +71,9 @@ export class VoiceRecognition {
    * @param components Optional components to initialize the VoiceRecognition instance.
    * @constructor
    */
-  constructor(components?: STTComponents) {
-    this.debugLog = components?.debugLog ?? false;
-    this.debugLogged = false;
+  constructor(components: STTComponents) {
+    this.logger = components.logger ?? false;
+    this.logSent = false;
   }
 
   /**
@@ -93,7 +92,7 @@ export class VoiceRecognition {
     const command: ChildProcess = exec(playerCommand[player]);
 
     command.stderr?.on("data", (data) => {
-      if (this.debugLog && !this.debugLogged) {
+      if (this.logger && !this.logSent) {
         const lines = data.toString().split("\n");
         if (lines.length) {
           this.createLog(lines);
@@ -181,9 +180,8 @@ export class VoiceRecognition {
 
     return null;
   }
-
   /**
-   * Creates debug logs with the provided information about the voice recognition process.
+   * Creates logger with the provided information about the voice recognition process.
    * @param info Information to be logged.
    */
   private createLog(info: string[] | string): void {
@@ -195,13 +193,13 @@ export class VoiceRecognition {
       logMessage += `* ${info}\n`;
     }
 
-    if (!this.debugLogged && typeof info === "object") {
+    if (!this.logSent && typeof info === "object") {
       info
         .filter((line) => logPrefixRegex.test(line))
         .forEach((line) => {
           logMessage += `* ${line}\n`;
         });
-      this.debugLogged = true;
+      this.logSent = true;
     }
 
     console.log(logMessage);
