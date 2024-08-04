@@ -14,6 +14,13 @@ type Player = "soxWindows" | "soxLinux";
  */
 interface STTComponents {
   /**
+   * API Token for accessing the Deepgram and Edenai APIs.
+   */
+  apiTokens: {
+    Deepgram: string;
+    Google: string;
+  };
+  /**
    * A boolean flag indicates whether logger is enabled.
    */
   logger?: boolean;
@@ -25,7 +32,6 @@ interface STTComponents {
 interface GoogleSpeechComponents {
   language: string;
   audioFile: string;
-  apiKey: string;
 }
 
 /**
@@ -34,7 +40,6 @@ interface GoogleSpeechComponents {
 interface DeepgramSpeechComponents {
   language: string;
   model: "nova-2" | "nova" | "enhanced" | "base";
-  apiKey: string;
   audioFile: string;
 }
 
@@ -62,9 +67,10 @@ export class VoiceRecognition {
    */
   private logSent: boolean;
   /**
-   * API key for accessing the Google Speech service.
+   * The API tokens for accessing the Deepgram and Edenai APIs.
+   * @public
    */
-  apiKey: string | undefined;
+  public apiTokens: { Deepgram: string; Google: string };
 
   /**
    * Constructs a new VoiceRecognition instance.
@@ -72,23 +78,27 @@ export class VoiceRecognition {
    * @constructor
    */
   constructor(components: STTComponents) {
+    this.apiTokens = components.apiTokens;
     this.logger = components.logger ?? false;
     this.logSent = false;
   }
 
   /**
    * Performs voice recognition on the audio file specified by the filename.
+   * @param player The player type.
    * @param filename The temp filename of the audio file for voice recognition.
+   * @param callback The callback function to handle the result.
    */
   public voiceRecognition(
     player: Player,
     filename: string,
     callback: (result: string | void) => void
-  ): string | void {
+  ): void {
     const playerCommand: Record<Player, string> = {
       soxWindows: `sox -t waveaudio default --encoding signed-integer --bits 16 --rate 16000 ${filename}.wav silence 1 0.1 5% 1 1.0 5%`,
       soxLinux: `sox -t alsa default --encoding signed-integer --bits 16 --rate 16000 ${filename}.flac silence 1 0.1 5% 1 3.0 5%`,
     };
+
     const command: ChildProcess = exec(playerCommand[player]);
 
     command.stderr?.on("data", (data) => {
@@ -101,8 +111,8 @@ export class VoiceRecognition {
     });
 
     command.on("exit", (code) => {
-      this.createLog(`VoiceRecognition Closed with Code: ${code}`);
-      if (code == 0) callback(`${filename}.wav`);
+      this.createLog(`VoiceRecognition closed with code: ${code}`);
+      if (code === 0) callback(`${filename}.wav`);
     });
   }
 
@@ -114,48 +124,52 @@ export class VoiceRecognition {
   public async fetchTranscriptGoogle(
     components: GoogleSpeechComponents
   ): Promise<TranscriptResult | null> {
-    const apiUrl = "https://www.google.com/speech-api/v2/recognize";
-    const apiKey = components.apiKey;
-    const params = querystring.stringify({
-      output: "json",
-      lang: components.language,
-      key: apiKey,
-    });
-    const headers = { "Content-Type": "audio/x-flac; rate=16000;" };
-    const audioData = fs.readFileSync(components.audioFile);
-    const url = `${apiUrl}?${params}`;
-    const response = await axios.post(url, audioData, { headers });
-    return this.parseResponse(response.data);
+    try {
+      const apiUrl = "https://www.google.com/speech-api/v2/recognize";
+      const params = querystring.stringify({
+        output: "json",
+        lang: components.language,
+        key: this.apiTokens.Google,
+      });
+      const headers = { "Content-Type": "audio/x-flac; rate=16000;" };
+      const audioData = fs.readFileSync(components.audioFile);
+      const url = `${apiUrl}?${params}`;
+      const response = await axios.post(url, audioData, { headers });
+      return this.parseResponse(response.data);
+    } catch (error) {
+      this.createLog(`Error fetching Google transcript: ${error}`);
+      return null;
+    }
   }
 
   /**
    * Fetch transcript from the Deepgram Speech-to-Text API.
    * @param components - Object containing Deepgram components.
-   * @returns {Promise<SyncPrerecordedResponse>} - Returns the transcribed result.
+   * @returns {Promise<SyncPrerecordedResponse | null>} - Returns the transcribed result.
    * @throws {Error} - Throws an error if there's an issue with the API key or transcription process.
    */
-  public async fetchTrascriptDeepgram(
+  public async fetchTranscriptDeepgram(
     components: DeepgramSpeechComponents
-  ): Promise<SyncPrerecordedResponse> {
-    const apiKey = components.apiKey;
-    const client = apiKey
-      ? createClient(apiKey)
-      : (() => {
-          throw new Error(
-            "Deepgram API key is missing. Please provide a valid API key."
-          );
-        })();
-    const { result, error } = await client.listen.prerecorded.transcribeFile(
-      fs.readFileSync(components.audioFile),
-      {
-        language: components.language,
-        model: components.model,
-        detect_language: true,
-        smart_format: true,
-      }
-    );
-    if (error) throw error;
-    return result;
+  ): Promise<SyncPrerecordedResponse | null> {
+    try {
+      const client = createClient(this.apiTokens.Deepgram);
+      const response = await client.listen.prerecorded.transcribeFile(
+        fs.readFileSync(components.audioFile),
+        {
+          language: components.language,
+          model: components.model,
+          detect_language: true,
+          smart_format: true,
+        }
+      );
+      if (response.error) throw response.error;
+      return response.result;
+    } catch (error) {
+      this.createLog(`Error fetching Deepgram transcript: ${error}`);
+      throw new Error(
+        "Deepgram API key is missing or there's an issue with the transcription process."
+      );
+    }
   }
 
   /**
@@ -164,22 +178,27 @@ export class VoiceRecognition {
    * @returns {TranscriptResult | null} The parsed transcript result, or null if no result is found.
    */
   private parseResponse(responseText: string): TranscriptResult | null {
-    const lines = responseText.split("\n");
-    for (const line of lines) {
-      if (!line) continue;
+    try {
+      const lines = responseText.split("\n");
+      for (const line of lines) {
+        if (!line) continue;
 
-      const result: TranscriptResult[] = JSON.parse(line).result;
+        const result: TranscriptResult[] = JSON.parse(line).result;
 
-      if (result.length !== 0) {
-        if (result[0].alternative.length === 0) {
-          throw new Error("No transcribed text found in the response.");
+        if (result.length !== 0) {
+          if (result[0].alternative.length === 0) {
+            throw new Error("No transcribed text found in the response.");
+          }
+          return result[0];
         }
-        return result[0];
       }
+      return null;
+    } catch (error) {
+      this.createLog(`Error parsing response: ${error}`);
+      return null;
     }
-
-    return null;
   }
+
   /**
    * Creates logger with the provided information about the voice recognition process.
    * @param info Information to be logged.
@@ -191,9 +210,7 @@ export class VoiceRecognition {
 
     if (typeof info === "string") {
       logMessage += `* ${info}\n`;
-    }
-
-    if (!this.logSent && typeof info === "object") {
+    } else {
       info
         .filter((line) => logPrefixRegex.test(line))
         .forEach((line) => {

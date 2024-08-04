@@ -32,21 +32,30 @@ const summarizeText = new SummarizeText({
   },
   logger: true,
 });
-const voice = new VoiceRecognition({ logger: true });
+const voice = new VoiceRecognition({
+  apiTokens: { Google: "GOOGLE_API_TOKEN", Deepgram: "DEEPGRAM_API_TOKEN" },
+  logger: true,
+});
 const audio = new AudioGemini({ logger: true });
 
 async function voiceRecognition() {
   const audioName = "output/record_voice";
   voice.voiceRecognition("soxWindows", audioName, async (result) => {
     if (!result) throw Error("Error related with SoX.");
-    const test = await voice.fetchTrascriptDeepgram({
+
+    const transcript = await voice.fetchTranscriptDeepgram({
       model: "nova-2",
       language: "id",
       audioFile: result,
-      apiKey: "API_KEY",
     });
-    console.log(test.results.channels[0].alternatives[0].transcript);
-    await chat(test.results.channels[0].alternatives[0].transcript);
+
+    if (!transcript) {
+      throw Error("No transcript available.");
+    }
+
+    const transcriptText =
+      transcript.results.channels[0].alternatives[0].transcript;
+    await chat(transcriptText);
   });
 }
 

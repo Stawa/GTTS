@@ -8,6 +8,9 @@ interface SummarizeTextComponents {
     Deepgram: string;
     Edenai: string;
   };
+  /**
+   * A boolean flag indicates whether logger is enabled.
+   */
   logger?: boolean;
 }
 
@@ -35,12 +38,30 @@ interface EdenaiComponents {
    * The language code of the text.
    */
   languageCode: string;
+  /**
+   * The number of output sentences desired in the summarized text.
+   */
   output_sentences: number;
 }
 
+/**
+ * The SummarizeText class provides methods to summarize text using the Deepgram and Edenai APIs.
+ */
 export class SummarizeText {
+  /**
+   * The API URLs for Deepgram and Edenai.
+   * @private
+   */
   private readonly apiUrl: { Deepgram: string; Edenai: string };
-  private readonly apiTokens: { Deepgram: string; Edenai: string };
+  /**
+   * The API tokens for accessing the Deepgram and Edenai APIs.
+   * @public
+   */
+  public apiTokens: { Deepgram: string; Edenai: string };
+  /**
+   * A boolean flag indicates whether logging is enabled.
+   * @public
+   */
   public logger: boolean;
 
   constructor(components: SummarizeTextComponents) {

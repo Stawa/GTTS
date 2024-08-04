@@ -118,8 +118,14 @@ export class TextToSpeech {
    * @param components Optional components to initialize the TextToSpeech instance.
    */
   constructor(components?: TTSComponents) {
-    this.apiToken = components?.apiToken;
-    this.sessionId = components?.sessionId;
+    if (!components?.apiToken || !components?.sessionId) {
+      throw new Error(
+        "API key or SessionID is missing. Please provide a valid API or SessionID key."
+      );
+    }
+
+    this.apiToken = components.apiToken;
+    this.sessionId = components.sessionId;
     this.logger = components?.logger ?? false;
   }
 
