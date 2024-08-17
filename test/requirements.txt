@@ -1,0 +1,3 @@
+pyaudio
+deepgram-sdk
+python-dotenv

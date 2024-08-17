@@ -45,7 +45,7 @@ async function voiceRecognition() {
 
     const transcript = await voice.fetchTranscriptDeepgram({
       model: "nova-2",
-      language: "id",
+      language: "en",
       audioFile: result,
     });
 
