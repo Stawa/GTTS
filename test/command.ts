@@ -6,21 +6,30 @@ import {
   SummarizeText,
 } from "../lib";
 import { argv } from "process";
+import "dotenv/config";
+
+function getEnvVariable(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing environment variable: ${name}`);
+  }
+  return value;
+}
 
 const gemini = new GoogleGemini({
-  apiKey: "GEMINI_API_KEY", // GEMINI_API_KEY
+  apiKey: getEnvVariable("GEMINI_API_KEY"), // GEMINI_API_KEY
   models: "gemini-1.5-flash", // Can pick any models of Gemini
   logger: true,
 });
 const textspeech = new TextToSpeech({
-  apiToken: "DEEPGRAM_API_TOKEN", // DEEPGRAM_API_TOKEN
+  apiToken: getEnvVariable("DEEPGRAM_API_KEY"), // DEEPGRAM_API_TOKEN
   sessionId: "TIKTOK_SESSION_ID", // TIKTOK_SESSION_ID
   logger: true,
 });
 const summarizeText = new SummarizeText({
   apiTokens: {
-    Deepgram: "DEEPGRAM_API_TOKEN", // Required if you use Deepgram API; if not, leave blank.
-    Edenai: "EDENAI_API_TOKEN", // Required if you use Edenai API; if not, leave blank.
+    Deepgram: getEnvVariable("DEEPGRAM_API_KEY"), // Required if you use Deepgram API; if not, leave blank.
+    Edenai: getEnvVariable("EDENAI_API_TOKEN"), // Required if you use Edenai API; if not, leave blank.
   },
   logger: true,
 });
