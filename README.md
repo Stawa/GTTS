@@ -116,18 +116,19 @@
     <ul>
       <li><code>choco install ffmpeg</code></li>
       <li><code>sudo apt install ffmpeg</code></li>
+      <li><a href="https://www.ffmpeg.org/download.html">FFmpeg Downloads</a></li>
     </ul>
   </li>
 </ul>
 
 <p>Then install the repository using the following commands:</p>
-<pre>
-<code># npm
-$ npm install git+https://github.com/Stawa/GTTS.git
+
+```bash
+# npm
+$ npm install git+https://github.com/Stawa/GTTS.git --legacy-peer-deps
 # Bun
-$ bun install git+https://github.com/Stawa/GTTS.git
-</code>
-</pre>
+$ bun install git+https://github.com/Stawa/GTTS.git --trust
+```
 
 <hr />
 
