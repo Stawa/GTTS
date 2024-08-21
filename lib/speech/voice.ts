@@ -14,7 +14,7 @@ type Player = "soxWindows" | "soxLinux";
  */
 interface STTComponents {
   /**
-   * API Token for accessing the Deepgram and Edenai APIs.
+   * API Token for accessing the Deepgram and Google APIs.
    */
   apiTokens: {
     Deepgram: string;
@@ -67,7 +67,7 @@ export class VoiceRecognition {
    */
   private logSent: boolean;
   /**
-   * The API tokens for accessing the Deepgram and Edenai APIs.
+   * The API tokens for accessing the Deepgram and Google APIs.
    * @public
    */
   public apiTokens: { Deepgram: string; Google: string };

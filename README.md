@@ -147,6 +147,9 @@ $ bun install git+https://github.com/Stawa/GTTS.git --trust
   <li><b>Deepgram API Key</b> (<code>lib.VoiceRecognition.fetchTranscriptDeepgram</code>)
     <ul><li>Obtain from <a href="https://console.deepgram.com/">Deepgram</a></li></ul>
   </li>
+  <li><b>EdenAI</b> (<code>lib.SummarizeText</code>)
+    <ul><li>Obtain from <a href="https://edenai.co/">EdenAI</a></li></ul>
+  </li>
 </ul>
 
 <p>This is an example of how you get a generated response from the Google Gemini API; it only takes one function:</p>
