@@ -32,7 +32,7 @@
   "dependencies": {
     "@deepgram/sdk": "^3.5.1",
     "@google-cloud/text-to-speech": "^5.4.0",
-    "@google/generative-ai": "^0.16.0",
+    "@google/generative-ai": "^0.17.1",
     "@iamtraction/google-translate": "^2.0.1",
     "axios": "^1.7.5",
     "music-metadata": "^7.14.0",
