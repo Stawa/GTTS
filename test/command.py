@@ -193,7 +193,7 @@ def main():
     api_key = os.getenv("DEEPGRAM_API_KEY")
 
     if not api_key:
-        raise Exception("DEEPGRAM_API_KEY not set in environment variables")
+        raise ValueError("DEEPGRAM_API_KEY not set in environment variables")
 
     vr = VoiceRecognition(trigger_phrases, api_key)
     vr.run()
