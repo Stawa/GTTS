@@ -1,7 +1,7 @@
 {
   "name": "@stawa/gtts",
   "author": "Stawa",
-  "version": "0.0.8",
+  "version": "0.0.0",
   "description": "This project converts written material into speech by using Google AI (Gemini) for text creation or internet searches.",
   "module": "index.ts",
   "type": "module",
@@ -17,13 +17,10 @@
     "build": "rimraf dist && tsc --build",
     "postinstall": "npm run build",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "version": "node -e \"const fs = require('fs'); const { execSync } = require('child_process'); try { const tag = execSync('git describe --tags --abbrev=0').toString().trim(); const version = tag.startsWith('v') ? tag.slice(1) : tag; const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); if (pkg.version !== version) { execSync('npm --no-git-tag-version version ' + version, { stdio: 'inherit' }); console.log('Version updated to ' + version); } else { console.log('Version unchanged: ' + version); } } catch (error) { console.error('Error updating version:', error.message); process.exit(0); }\"",
+    "version:test": "npm run version && node -e \"console.log(JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version)\""
   },
-  "os": [
-    "darwin",
-    "linux",
-    "win32"
-  ],
   "devDependencies": {
     "@types/bun": "latest",
     "tsx": "^4.17.0"
