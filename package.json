@@ -15,10 +15,10 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "rimraf dist && tsc --build",
-    "postinstall": "npm run build",
+    "postinstall": "npm run build && npm run version",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "version": "node -e \"const fs = require('fs'); const { execSync } = require('child_process'); try { const tag = execSync('git describe --tags --abbrev=0').toString().trim(); const version = tag.startsWith('v') ? tag.slice(1) : tag; const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); if (pkg.version !== version) { execSync('npm --no-git-tag-version version ' + version, { stdio: 'inherit' }); console.log('Version updated to ' + version); } else { console.log('Version unchanged: ' + version); } } catch (error) { console.error('Error updating version:', error.message); process.exit(0); }\"",
+    "version": "node -e \"const https = require('https'); const fs = require('fs'); const options = { hostname: 'api.github.com', path: '/repos/Stawa/GTTS/tags', headers: { 'User-Agent': 'Node.js' } }; https.get(options, (res) => { let data = ''; res.on('data', (chunk) => data += chunk); res.on('end', () => { const tags = JSON.parse(data); if (tags.length > 0) { const latestVersion = tags[0].name.startsWith('v') ? tags[0].name.slice(1) : tags[0].name; const pkg = JSON.parse(fs.readFileSync('package.json')); if (pkg.version !== latestVersion) { pkg.version = latestVersion; fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2)); console.log('Version updated to ' + latestVersion); } else { console.log('Version unchanged: ' + latestVersion); } } else { console.log('No tags found'); } }); }).on('error', (e) => console.error('Error fetching version:', e.message));\"",
     "version:test": "npm run version && node -e \"console.log(JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version)\""
   },
   "devDependencies": {
