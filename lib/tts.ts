@@ -142,7 +142,7 @@ export class TextToSpeech {
         });
         writer.on("error", (err) => {
           console.error("Error writing file:", err);
-          reject(undefined);
+          reject(new Error("Failed to write audio file"));
         });
       });
     } catch (error) {
@@ -160,7 +160,7 @@ export class TextToSpeech {
     try {
       const language = args.detectLanguage
         ? await this.detectLanguage(args.text)
-        : TikTokVoiceSpeaker.Jessie;
+        : TikTokVoiceSpeaker.FemaleEnglishUS1;
       const formattedText = this.formatText(args.text);
       const headers = {
         "User-Agent":
@@ -271,7 +271,7 @@ export class TextToSpeech {
    */
   private async detectLanguage(text: string): Promise<string> {
     const languageMap: { [key: string]: TikTokVoiceSpeaker } = {
-      EN: TikTokVoiceSpeaker.Jessie,
+      EN: TikTokVoiceSpeaker.FemaleEnglishUS1,
       ES: TikTokVoiceSpeaker.SpanishMXMale,
       FR: TikTokVoiceSpeaker.FrenchMale1,
       PT: TikTokVoiceSpeaker.PortugueseBRFemale1,
@@ -283,6 +283,6 @@ export class TextToSpeech {
     };
     const result = await translate(text);
     const detectedLanguage = result.from.language.iso.toUpperCase();
-    return languageMap[detectedLanguage] || TikTokVoiceSpeaker.Jessie;
+    return languageMap[detectedLanguage] || TikTokVoiceSpeaker.FemaleEnglishUS1;
   }
 }

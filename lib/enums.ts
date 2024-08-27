@@ -3,7 +3,6 @@ export enum TikTokVoiceSpeaker {
   GameOn = "en_male_jomboy",
   FemaleEnglishUS1 = "en_us_001",
   FemaleEnglishUS2 = "en_us_002",
-  Jessie = "en_us_002",
   Wacky = "en_male_funny",
   Empathetic = "en_female_samc",
   Serious = "en_male_cody",
