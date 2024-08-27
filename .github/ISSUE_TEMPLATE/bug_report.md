@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Write a report so that we may improve our project.
-title: ''
+title: ""
 labels: bug
-assignees: ''
-
+assignees: ""
 ---
 
 **Describe the issue that occurred.**
@@ -14,6 +13,7 @@ A quick and straightforward explanation of the bug's cause.
 A clear and concise explanation of what you expected to happen.
 
 **Environment**
+
 ```os
  - OS: [e.g. Windows]
  - Bun / NPM: [e.g v1.1.12]

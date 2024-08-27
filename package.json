@@ -16,7 +16,6 @@
     "prepare": "npm run build",
     "build": "rimraf dist && tsc --build",
     "postinstall": "npm run build",
-    "version:patch": "node version.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

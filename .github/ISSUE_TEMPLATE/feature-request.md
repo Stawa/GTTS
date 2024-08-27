@@ -1,10 +1,9 @@
 ---
 name: Feature Request
 about: Share a Suggestion for This Project
-title: ''
+title: ""
 labels: enhancement
 assignees: Stawa
-
 ---
 
 **Does this feature resolve any specific issue?**
