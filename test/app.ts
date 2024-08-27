@@ -100,7 +100,7 @@ async function chat(text: string) {
       throw new Error("Failed to generate audio.");
     }
 
-    await audio.playAudio("ffmpeg", botAudio);
+    audio.playAudio("ffmpeg", botAudio);
   } catch (error) {
     console.error("Error in chat function:", error);
   }
