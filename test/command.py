@@ -1,3 +1,8 @@
+import os
+import subprocess
+import time
+import logging
+from typing import List
 from deepgram import (
     DeepgramClient,
     LiveTranscriptionEvents,
@@ -5,9 +10,6 @@ from deepgram import (
     Microphone,
 )
 from dotenv import load_dotenv
-import os
-import logging
-import time
 
 load_dotenv()
 
@@ -18,123 +20,184 @@ logger = logging.getLogger()
 
 
 class VoiceRecognition:
-    def __init__(self, phrases: list, api_key: str) -> None:
+    def __init__(self, trigger_phrases: List[str], api_key: str):
         self.client = DeepgramClient(api_key=api_key)
-        self.finalized_transcriptions = []
-        self.phrases = phrases
-        self.processing_command = False
+        self.trigger_phrases = trigger_phrases
+        self.transcriptions: List[str] = []
+        self.is_processing_command = False
+        self.microphone = None
+        self.dg_connection = None
+        self.is_reconnecting = False
 
-    def run(self, language: str = "en-US", model: str = "nova-2") -> None:
+    def run(self, language: str = "en-US", model: str = "nova-2"):
         try:
-            dg_connection = self.client.listen.websocket.v("1")
-            dg_connection.on(LiveTranscriptionEvents.Open, self.on_open)
-            dg_connection.on(LiveTranscriptionEvents.Transcript, self.on_message)
-            dg_connection.on(LiveTranscriptionEvents.Metadata, self.on_metadata)
-            dg_connection.on(
-                LiveTranscriptionEvents.SpeechStarted, self.on_speech_started
-            )
-            dg_connection.on(
-                LiveTranscriptionEvents.UtteranceEnd, self.on_utterance_end
-            )
-            dg_connection.on(LiveTranscriptionEvents.Close, self.on_close)
-            dg_connection.on(LiveTranscriptionEvents.Error, self.on_error)
-            dg_connection.on(LiveTranscriptionEvents.Unhandled, self.on_unhandled)
+            self.dg_connection = self._setup_connection()
+            options = self._create_live_options(language, model)
 
-            options = LiveOptions(
-                model=model,
-                language=language,
-                smart_format=True,
-                encoding="linear16",
-                channels=1,
-                sample_rate=16000,
-                interim_results=True,
-                utterance_end_ms="1000",
-                vad_events=True,
-                endpointing=300,
-            )
+            logger.info("Press Enter to stop recording...")
 
-            self.create_log("Press Enter to stop recording...")
-
-            if not dg_connection.start(options, addons={"no_delay": True}):
-                self.create_log("ERROR: Failed to connect to Deepgram")
+            if not self._start_connection(self.dg_connection, options):
                 return
-            self.create_log("INFO: Successfully connected to Deepgram")
 
-            microphone = Microphone(dg_connection.send, input_device_index=2)
-            self.create_log("INFO: Starting microphone recording...")
-            microphone.start()
-
+            self.microphone = self._start_microphone(self.dg_connection)
             input("")
-
-            self.create_log("INFO: Stopping microphone recording...")
-            microphone.finish()
-            dg_connection.finish()
-
-            self.create_log("INFO: Recording finished")
+            self._stop_recording(self.microphone, self.dg_connection)
 
         except Exception as e:
-            self.create_log(f"ERROR: Could not open socket: {e}")
+            logger.error(f"Could not open socket: {e}")
 
-    def on_open(self, *args, **kwargs):
-        self.create_log("INFO: Connection Open")
+    def _setup_connection(self):
+        dg_connection = self.client.listen.websocket.v("1")
+        event_handlers = {
+            LiveTranscriptionEvents.Open: self._on_open,
+            LiveTranscriptionEvents.Transcript: self._on_message,
+            LiveTranscriptionEvents.Metadata: self._on_metadata,
+            LiveTranscriptionEvents.SpeechStarted: self._on_speech_started,
+            LiveTranscriptionEvents.UtteranceEnd: self._on_utterance_end,
+            LiveTranscriptionEvents.Close: self._on_close,
+            LiveTranscriptionEvents.Error: self._on_error,
+            LiveTranscriptionEvents.Unhandled: self._on_unhandled,
+        }
+        for event, handler in event_handlers.items():
+            dg_connection.on(event, handler)
+        return dg_connection
 
-    def on_message(self, *args, **kwargs):
+    @staticmethod
+    def _create_live_options(language: str, model: str) -> LiveOptions:
+        return LiveOptions(
+            model=model,
+            language=language,
+            smart_format=True,
+            encoding="linear16",
+            channels=1,
+            sample_rate=16000,
+            interim_results=True,
+            utterance_end_ms="1000",
+            vad_events=True,
+            endpointing=300,
+        )
+
+    def _start_connection(self, dg_connection, options: LiveOptions) -> bool:
+        if not dg_connection.start(options, addons={"no_delay": True}):
+            logger.error("Failed to connect to Deepgram")
+            return False
+        logger.info("Successfully connected to Deepgram")
+        return True
+
+    @staticmethod
+    def _start_microphone(dg_connection):
+        logger.info("Starting microphone recording...")
+        microphone = Microphone(dg_connection.send, input_device_index=2)
+        microphone.start()
+        return microphone
+
+    @staticmethod
+    def _stop_recording(microphone: Microphone, dg_connection):
+        logger.info("Stopping microphone recording...")
+        microphone.finish()
+        dg_connection.finish()
+        logger.info("Recording finished")
+
+    def _on_open(self, *args, **kwargs):
+        logger.info("Connection Open")
+
+    def _on_message(self, *args, **kwargs):
         result = kwargs.get("result") if "result" in kwargs else args[0]
-        sentence = result.channel.alternatives[0].transcript.strip()
+        sentence = result.channel.alternatives[0].transcript.strip().lower()
         if not sentence:
             return
 
         if result.is_final:
-            self.finalized_transcriptions.append(sentence.lower())
-            if any(phrase in sentence.lower() for phrase in self.phrases):
-                self.create_log("INFO: Trigger phrase detected")
-                if not self.processing_command:
-                    os.system('bun run command.ts --audio "default"')
-                    time.sleep(3)
-                    self.processing_command = True
+            self.transcriptions.append(sentence)
+            if any(phrase in sentence for phrase in self.trigger_phrases):
+                self._handle_trigger_phrase()
         else:
-            self.create_log(f"DEBUG: Interim Results: {sentence}")
+            logger.debug(f"Interim Results: {sentence}")
 
-    def on_metadata(self, *args, **kwargs):
+    def _handle_trigger_phrase(self):
+        logger.info("Trigger phrase detected")
+        if not self.is_processing_command:
+            self._pause_microphone()
+            subprocess.run(["bun", "run", "command.ts", "--audio", "default"])
+            self.is_processing_command = True
+            self._resume_microphone()
+
+    def _pause_microphone(self):
+        if self.microphone:
+            logger.info("Pausing microphone...")
+            self.microphone.finish()
+
+    def _resume_microphone(self):
+        if self.dg_connection:
+            logger.info("Resuming microphone...")
+            self.microphone = self._start_microphone(self.dg_connection)
+
+    def _on_metadata(self, *args, **kwargs):
         metadata = kwargs.get("metadata", args[0] if args else None)
         if metadata:
-            self.create_log(f"INFO: Metadata: {metadata}")
+            logger.info(f"Metadata: {metadata}")
 
-    def on_speech_started(self, *args, **kwargs):
-        self.create_log("INFO: Speech Started")
+    def _on_speech_started(self, *args, **kwargs):
+        logger.info("Speech Started")
 
-    def on_utterance_end(self, *args, **kwargs):
-        if self.finalized_transcriptions:
-            utterance = " ".join(self.finalized_transcriptions)
-            self.create_log(f"INFO: Utterance End: {utterance}")
-            self.finalized_transcriptions.clear()
-            if self.processing_command:
-                if not any(phrase in utterance.lower() for phrase in self.phrases):
-                    os.system(f'bun run command.ts --text "{utterance}"')
-                    self.create_log(f"INFO: Asking Gemini about {utterance}")
-                    self.processing_command = False
+    def _on_utterance_end(self, *args, **kwargs):
+        if self.transcriptions:
+            utterance = " ".join(self.transcriptions)
+            logger.info(f"Utterance End: {utterance}")
+            self._process_utterance(utterance)
+            self.transcriptions.clear()
 
-    def on_close(self, *args, **kwargs):
-        self.create_log("INFO: Connection Closed")
+    def _process_utterance(self, utterance: str):
+        if self.is_processing_command:
+            if not any(phrase in utterance for phrase in self.trigger_phrases):
+                self._pause_microphone()
+                logger.info(f"Asking Gemini about '{utterance}'")
+                subprocess.run(["bun", "run", "command.ts", "--text", utterance])
+                self.is_processing_command = False
+                self._resume_microphone()
+                self.transcriptions.clear()
 
-    def on_error(self, *args, **kwargs):
+    def _on_close(self, *args, **kwargs):
+        logger.info("Connection Closed")
+        self._reconnect()
+
+    def _on_error(self, *args, **kwargs):
         error = kwargs.get("error", args[0] if args else None)
-        self.create_log(f"ERROR: Handled Error: {error}")
+        logger.error(f"Handled Error: {error}")
 
-    def on_unhandled(self, *args, **kwargs):
+    def _on_unhandled(self, *args, **kwargs):
         unhandled = kwargs.get("unhandled", args[0] if args else None)
-        self.create_log(f"WARNING: Unhandled Websocket Message: {unhandled}")
+        logger.warning(f"Unhandled Websocket Message: {unhandled}")
 
-    def create_log(self, message: str) -> None:
-        logger.info(message)
+    def _reconnect(self):
+        if self.is_reconnecting:
+            return
+        self.is_reconnecting = True
+        logger.info("Attempting to reconnect...")
+        try:
+            self.dg_connection = self._setup_connection()
+            options = self._create_live_options("en-US", "nova-2")
+            if self._start_connection(self.dg_connection, options):
+                self.microphone = self._start_microphone(self.dg_connection)
+                logger.info("Successfully reconnected")
+            else:
+                logger.error("Failed to reconnect")
+        except Exception as e:
+            logger.error(f"Error during reconnection: {e}")
+        finally:
+            self.is_reconnecting = False
 
 
-if __name__ == "__main__":
-    voice_command = ["hey, bot", "hey bot"]
+def main():
+    trigger_phrases = ["hey, buddy", "hey buddy"]
     api_key = os.getenv("DEEPGRAM_API_KEY")
 
     if not api_key:
-        raise Exception("ERROR: DEEPGRAM_API_KEY not set in environment variables")
+        raise Exception("DEEPGRAM_API_KEY not set in environment variables")
 
-    vr = VoiceRecognition(voice_command, api_key)
+    vr = VoiceRecognition(trigger_phrases, api_key)
     vr.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -17,41 +17,44 @@ function getEnvVariable(name: string): string {
 }
 
 const gemini = new GoogleGemini({
-  apiKey: getEnvVariable("GEMINI_API_KEY"), // GEMINI_API_KEY
-  models: "gemini-1.5-flash", // Can pick any models of Gemini
+  apiKey: getEnvVariable("GEMINI_API_KEY"),
+  model: "gemini-1.5-flash",
+  enableLogging: true,
+});
+
+const textToSpeech = new TextToSpeech({
+  apiToken: getEnvVariable("DEEPGRAM_API_KEY"),
+  sessionId: getEnvVariable("TIKTOK_SESSION_ID"),
   logger: true,
 });
-const textspeech = new TextToSpeech({
-  apiToken: getEnvVariable("DEEPGRAM_API_KEY"), // DEEPGRAM_API_TOKEN
-  sessionId: "TIKTOK_SESSION_ID", // TIKTOK_SESSION_ID
-  logger: true,
-});
+
 const summarizeText = new SummarizeText({
   apiTokens: {
-    Deepgram: getEnvVariable("DEEPGRAM_API_KEY"), // Required if you use Deepgram API; if not, leave blank.
-    Edenai: getEnvVariable("EDENAI_API_TOKEN"), // Required if you use Edenai API; if not, leave blank.
+    Deepgram: getEnvVariable("DEEPGRAM_API_KEY"),
+    Edenai: getEnvVariable("EDENAI_API_TOKEN"),
   },
   logger: true,
 });
+
 const audio = new AudioGemini({ logger: true });
 
 async function chat(text: string) {
   try {
-    const res = await gemini.chat(text);
+    const response = await gemini.generateResponse(text);
     const audioName = "output/audio_generated";
 
-    const summarize = await summarizeText.edenai({
-      text: res,
+    const summary = await summarizeText.edenai({
+      text: response,
       languageCode: "en",
       providers: "openai",
       output_sentences: 3,
     });
 
-    const botAudio = await textspeech.createSpeech({
-      SpeechProvider: "Deepgram",
+    const botAudio = await textToSpeech.createSpeech({
+      speechProvider: "Deepgram",
       components: {
-        text: summarize.result,
-        audioName: audioName,
+        text: summary.result,
+        audioName,
         encodingAudio: "mp3",
         model: DeepgramVoiceSpeaker.Asteria,
       },
@@ -61,24 +64,32 @@ async function chat(text: string) {
       throw new Error("Failed to generate audio.");
     }
 
-    audio.playAudio("ffmpeg", botAudio || audioName);
+    audio.playAudio("ffmpeg", botAudio);
   } catch (error) {
     console.error("Error in chat function:", error);
   }
 }
 
-function main() {
-  const args = argv.slice(2);
-  const argsCommand = args[0];
-  const argsText = args[1];
+async function main() {
+  const [argsCommand, argsText] = argv.slice(2);
 
-  if (argsCommand === "--text" && argsText) {
-    chat(argsText);
-  } else if (argsCommand === "--audio") {
-    audio.playAudio("ffmpeg", "output/voice_default.mp3");
-  } else {
-    console.error("Invalid command or missing arguments.");
+  switch (argsCommand) {
+    case "--text":
+      if (argsText) {
+        await chat(argsText);
+      } else {
+        console.error("Missing text argument for --text command.");
+      }
+      break;
+    case "--audio":
+      audio.playAudio("ffmpeg", "output/voice_default.mp3");
+      break;
+    default:
+      console.error("Invalid command or missing arguments.");
   }
 }
 
-main();
+main().catch((error) => {
+  console.error("An error occurred:", error);
+  process.exit(1);
+});
