@@ -1,7 +1,7 @@
 {
   "name": "@stawa/gtts",
   "author": "Stawa",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "This project converts written material into speech by using Google AI (Gemini) for text creation or internet searches.",
   "module": "index.ts",
   "type": "module",
@@ -15,7 +15,10 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "rimraf dist && tsc --build",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "version:patch": "node version.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "os": [
     "darwin",
@@ -32,10 +35,12 @@
   "dependencies": {
     "@deepgram/sdk": "^3.5.1",
     "@google-cloud/text-to-speech": "^5.4.0",
-    "@google/generative-ai": "^0.16.0",
+    "@google/generative-ai": "^0.17.1",
     "@iamtraction/google-translate": "^2.0.1",
     "axios": "^1.7.5",
+    "dotenv": "^16.4.5",
     "music-metadata": "^7.14.0",
+    "prettier": "^3.3.3",
     "rimraf": "^6.0.1"
   }
 }

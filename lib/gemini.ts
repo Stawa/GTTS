@@ -1,88 +1,73 @@
 import { GoogleGenerativeAI, GenerativeModel } from "@google/generative-ai";
 
 /**
- * Interface for the components that can be passed to the GoogleGemini constructor.
+ * Configuration options for the GoogleGemini class.
  */
-interface GeminiComponents {
-  /**
-   * API key for accessing the Google Generative AI service.
-   */
+interface GeminiConfig {
+  /** API key for accessing the Google Generative AI service. */
   apiKey: string;
-  /**
-   * Model type to be used with the Google Generative AI service.
-   */
-  models: "gemini-1.5-pro" | "gemini-1.5-flash" | "gemini-1.0-pro";
-  /**
-   * A boolean flag indicates whether logger should be enabled.
-   */
-  logger?: boolean;
+  /** Model type to be used with the Google Generative AI service. */
+  model:
+    | "gemini-1.5-pro-latest"
+    | "gemini-1.5-flash-latest"
+    | "gemini-1.5-pro"
+    | "gemini-1.5-flash"
+    | "gemini-1.0-pro"
+    | "gemini-pro-vision"
+    | "gemini-pro";
+  /** Whether to enable logging. Defaults to false. */
+  enableLogging?: boolean;
 }
 
 /**
- * The Google Generative AI service (Gemini) is wrapped by the GoogleGemini class.
- * It provides text generation in response to prompts via interaction with the Gemini API.
+ * Wrapper class for interacting with Google's Generative AI service (Gemini).
+ * Provides methods for generating text responses based on prompts.
  */
 export class GoogleGemini {
-  /**
-   * Instance of GoogleGenerativeAI client.
-   */
-  public client: GoogleGenerativeAI;
-  /**
-   * Instance of GenerativeModel.
-   */
-  public model: GenerativeModel;
-  /**
-   * API key for accessing the Google Generative AI service.
-   */
-  public apiKey: string | undefined;
-  /**
-   * A boolean flag indicating whether logger are enabled.
-   */
-  public logger: boolean;
+  private readonly client: GoogleGenerativeAI;
+  private readonly model: GenerativeModel;
+  private readonly enableLogging: boolean;
 
   /**
-   * Constructs a new GoogleGemini instance.
-   * @param components Additional components to set the GoogleGemini instance setup.
+   * Creates a new GoogleGemini instance.
+   * @param config - Configuration options for the GoogleGemini instance.
+   * @throws {Error} If the API key is missing.
    */
-  constructor(components?: GeminiComponents) {
-    if (!components?.apiKey) {
+  constructor(config: GeminiConfig) {
+    if (!config.apiKey) {
       throw new Error("API key is missing. Please provide a valid API key.");
     }
 
-    this.apiKey = components.apiKey;
-    this.logger = components.logger ?? false;
-    this.client = new GoogleGenerativeAI(this.apiKey);
-    this.model = this.client.getGenerativeModel({
-      model: components.models,
-    });
+    this.client = new GoogleGenerativeAI(config.apiKey);
+    this.model = this.client.getGenerativeModel({ model: config.model });
+    this.enableLogging = config.enableLogging ?? false;
   }
 
   /**
-   * Utilizing the Google Generative AI service, it generates a response based on the given prompt.
-   * @param prompt The prompt for generating the response.
-   * @returns A Promise that resolves to the generated response.
+   * Generates a response based on the given prompt using the Google Generative AI service.
+   * @param prompt - The input prompt for generating the response.
+   * @returns A Promise that resolves to the generated response text.
    */
-  public async chat(prompt: string): Promise<string> {
-    const getResponse = await this.model.generateContent(prompt);
-    const response = getResponse.response.text();
-    this.createLog([
-      `User Prompt: ${prompt}`,
-      `Original Response: ${response}`,
-    ]);
+  public async generateResponse(prompt: string): Promise<string> {
+    const result = await this.model.generateContent(prompt);
+    const response = result.response.text();
+
+    this.log([`User Prompt: ${prompt}`, `Generated Response: ${response}`]);
+
     return response;
   }
 
   /**
-   * When logger is enabled, creates a logger using the information provided.
-   * @param info Information to be logged. It can be a string or an array of strings.
+   * Logs information if logging is enabled.
+   * @param info - Information to be logged. Can be a string or an array of strings.
    */
-  private createLog(info: string[] | string): void {
-    if (!this.logger) return;
+  private log(info: string | string[]): void {
+    if (!this.enableLogging) return;
 
-    const prefix =
-      typeof info === "string"
-        ? `* ${info}`
-        : info.map((line) => `* ${line}`).join("\n");
-    console.log(`[DEBUG GoogleGemini]\n${prefix}`);
+    const logMessage = Array.isArray(info)
+      ? info.map((line) => `* ${line}`).join("\n")
+      : `* ${info}`;
+
+    console.log(`[DEBUG GoogleGemini]\n${logMessage}`);
   }
 }

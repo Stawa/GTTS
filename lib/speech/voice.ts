@@ -1,4 +1,4 @@
-import { exec, type ChildProcess } from "child_process";
+import { spawn, type ChildProcess } from "child_process";
 import { createClient, type SyncPrerecordedResponse } from "@deepgram/sdk";
 import fs from "fs";
 import axios from "axios";
@@ -27,20 +27,27 @@ interface STTComponents {
 }
 
 /**
- * Interface for Google Speech components.
+ * Interface for Speech components shared by Google and Deepgram.
  */
-interface GoogleSpeechComponents {
+interface SpeechComponents {
+  /**
+   * The language code for the audio.
+   */
   language: string;
+  /**
+   * The path to the audio file.
+   */
   audioFile: string;
 }
 
 /**
  * Interface for Deepgram Speech to Text components.
  */
-interface DeepgramSpeechComponents {
-  language: string;
+interface DeepgramSpeechComponents extends SpeechComponents {
+  /**
+   * The Deepgram model to use for transcription.
+   */
   model: "nova-2" | "nova" | "enhanced" | "base";
-  audioFile: string;
 }
 
 /**
@@ -74,12 +81,12 @@ export class VoiceRecognition {
 
   /**
    * Constructs a new VoiceRecognition instance.
-   * @param components Optional components to initialize the VoiceRecognition instance.
+   * @param components Components to initialize the VoiceRecognition instance.
    * @constructor
    */
-  constructor(components: STTComponents) {
-    this.apiTokens = components.apiTokens;
-    this.logger = components.logger ?? false;
+  constructor({ apiTokens, logger = false }: STTComponents) {
+    this.apiTokens = apiTokens;
+    this.logger = logger;
     this.logSent = false;
   }
 
@@ -94,19 +101,57 @@ export class VoiceRecognition {
     filename: string,
     callback: (result: string | void) => void
   ): void {
-    const playerCommand: Record<Player, string> = {
-      soxWindows: `sox -t waveaudio default --encoding signed-integer --bits 16 --rate 16000 ${filename}.wav silence 1 0.1 5% 1 1.0 5%`,
-      soxLinux: `sox -t alsa default --encoding signed-integer --bits 16 --rate 16000 ${filename}.flac silence 1 0.1 5% 1 3.0 5%`,
+    const playerCommands: Record<Player, string[]> = {
+      soxWindows: [
+        "sox",
+        "-t",
+        "waveaudio",
+        "default",
+        "--encoding",
+        "signed-integer",
+        "--bits",
+        "16",
+        "--rate",
+        "16000",
+        `${filename}.wav`,
+        "silence",
+        "1",
+        "0.1",
+        "5%",
+        "1",
+        "1.0",
+        "5%",
+      ],
+      soxLinux: [
+        "sox",
+        "-t",
+        "alsa",
+        "default",
+        "--encoding",
+        "signed-integer",
+        "--bits",
+        "16",
+        "--rate",
+        "16000",
+        `${filename}.flac`,
+        "silence",
+        "1",
+        "0.1",
+        "5%",
+        "1",
+        "3.0",
+        "5%",
+      ],
     };
 
-    const command: ChildProcess = exec(playerCommand[player]);
+    const command: ChildProcess = spawn(
+      playerCommands[player][0],
+      playerCommands[player].slice(1)
+    );
 
     command.stderr?.on("data", (data) => {
       if (this.logger && !this.logSent) {
-        const lines = data.toString().split("\n");
-        if (lines.length) {
-          this.createLog(lines);
-        }
+        this.createLog(data.toString().split("\n"));
       }
     });
 
@@ -119,20 +164,21 @@ export class VoiceRecognition {
   /**
    * Fetch transcript from the Google Speech-to-Text API.
    * @param components - Object containing Google Speech components.
-   * @returns {Promise<TranscriptResult | null>} - Promise containing the AxiosResponse.
+   * @returns {Promise<TranscriptResult | null>} - Promise containing the transcription result or null if an error occurs.
    */
-  public async fetchTranscriptGoogle(
-    components: GoogleSpeechComponents
-  ): Promise<TranscriptResult | null> {
+  public async fetchTranscriptGoogle({
+    language,
+    audioFile,
+  }: SpeechComponents): Promise<TranscriptResult | null> {
     try {
       const apiUrl = "https://www.google.com/speech-api/v2/recognize";
       const params = querystring.stringify({
         output: "json",
-        lang: components.language,
+        lang: language,
         key: this.apiTokens.Google,
       });
       const headers = { "Content-Type": "audio/x-flac; rate=16000;" };
-      const audioData = fs.readFileSync(components.audioFile);
+      const audioData = fs.readFileSync(audioFile);
       const url = `${apiUrl}?${params}`;
       const response = await axios.post(url, audioData, { headers });
       return this.parseResponse(response.data);
@@ -145,19 +191,21 @@ export class VoiceRecognition {
   /**
    * Fetch transcript from the Deepgram Speech-to-Text API.
    * @param components - Object containing Deepgram components.
-   * @returns {Promise<SyncPrerecordedResponse | null>} - Returns the transcribed result.
+   * @returns {Promise<SyncPrerecordedResponse | null>} - Returns the transcribed result or null if an error occurs.
    * @throws {Error} - Throws an error if there's an issue with the API key or transcription process.
    */
-  public async fetchTranscriptDeepgram(
-    components: DeepgramSpeechComponents
-  ): Promise<SyncPrerecordedResponse | null> {
+  public async fetchTranscriptDeepgram({
+    language,
+    model,
+    audioFile,
+  }: DeepgramSpeechComponents): Promise<SyncPrerecordedResponse | null> {
     try {
       const client = createClient(this.apiTokens.Deepgram);
       const response = await client.listen.prerecorded.transcribeFile(
-        fs.readFileSync(components.audioFile),
+        fs.readFileSync(audioFile),
         {
-          language: components.language,
-          model: components.model,
+          language,
+          model,
           detect_language: true,
           smart_format: true,
         }
@@ -185,10 +233,7 @@ export class VoiceRecognition {
 
         const result: TranscriptResult[] = JSON.parse(line).result;
 
-        if (result.length !== 0) {
-          if (result[0].alternative.length === 0) {
-            throw new Error("No transcribed text found in the response.");
-          }
+        if (result.length !== 0 && result[0].alternative.length !== 0) {
           return result[0];
         }
       }
@@ -201,7 +246,7 @@ export class VoiceRecognition {
 
   /**
    * Creates logger with the provided information about the voice recognition process.
-   * @param info Information to be logged.
+   * @param info Information to be logged. Can be a string or an array of strings.
    */
   private createLog(info: string[] | string): void {
     let logMessage = "[DEBUG VoiceRecognition]\n";

@@ -1,7 +1,8 @@
 export enum TikTokVoiceSpeaker {
-  // English
+  // English (US)
   GameOn = "en_male_jomboy",
-  FemaleEnglishUS = "en_us_001",
+  FemaleEnglishUS1 = "en_us_001",
+  FemaleEnglishUS2 = "en_us_002",
   Jessie = "en_us_002",
   Wacky = "en_male_funny",
   Empathetic = "en_female_samc",
@@ -12,17 +13,29 @@ export enum TikTokVoiceSpeaker {
   Joey = "en_us_006",
   StoryTeller = "en_male_narration",
   MrGoodGuy = "en_male_deadpool",
+  Professor = "en_us_007",
+  Scientist = "en_us_009",
+  Confidence = "en_us_010",
+
+  // English (UK)
   Narrator = "en_uk_001",
   MaleEnglishUK = "en_uk_003",
+
+  // English (Australia)
   Metro = "en_au_001",
+  Smooth = "en_au_002",
+
+  // Character Voices
   Alfred = "en_male_jarvis",
-  ashmagic = "en_male_ashmagic",
-  olantekkers = "en_male_olantekkers",
+  AshMagic = "en_male_ashmagic",
+  OlanTekkers = "en_male_olantekkers",
   LordCringe = "en_male_ukneighbor",
   MrMeticulous = "en_male_ukbutler",
   Debutante = "en_female_shenna",
   Varsity = "en_female_pansino",
   Marty = "en_male_trevor",
+
+  // Themed Voices
   PopLullaby = "en_female_f08_twinkle",
   ClassicElectric = "en_male_m03_classical",
   Bae = "en_female_betty",
@@ -45,12 +58,8 @@ export enum TikTokVoiceSpeaker {
   Jingle = "en_male_m03_lobby",
   Thanksgiving = "en_male_sing_funny_thanksgiving",
   Cottagecore = "en_female_f08_salut_damour",
-  Professor = "en_us_007",
-  Scientist = "en_us_009",
-  Confidence = "en_us_010",
-  Smooth = "en_au_002",
 
-  // Disney
+  // Disney Voices
   GhostFaceDisney = "en_us_ghostface",
   Chewbacca = "en_us_chewbacca",
   C3PO = "en_us_c3po",
@@ -120,16 +129,21 @@ export enum TikTokVoiceSpeaker {
 }
 
 export enum DeepgramVoiceSpeaker {
-  Asteria = "aura-asteria-en", // American, female
-  Orpheus = "aura-orpheus-en", // American, male
-  Angus = "aura-angus-en", // Irish, male
-  Arcas = "aura-arcas-en", // American, male
-  Athena = "aura-athena-en", // British, female
-  Helios = "aura-helios-en", // British, male
-  Hera = "aura-hera-en", // American, female
-  Luna = "aura-luna-en", // American, female
-  Orion = "aura-orion-en", // American, male
-  Perseus = "aura-perseus-en", // American, male
-  Stella = "aura-stella-en", // American, female
-  Zeus = "aura-zeus-en", // American, male
+  // American English
+  Asteria = "aura-asteria-en", // Female
+  Orpheus = "aura-orpheus-en", // Male
+  Arcas = "aura-arcas-en", // Male
+  Hera = "aura-hera-en", // Female
+  Luna = "aura-luna-en", // Female
+  Orion = "aura-orion-en", // Male
+  Perseus = "aura-perseus-en", // Male
+  Stella = "aura-stella-en", // Female
+  Zeus = "aura-zeus-en", // Male
+
+  // British English
+  Athena = "aura-athena-en", // Female
+  Helios = "aura-helios-en", // Male
+
+  // Irish English
+  Angus = "aura-angus-en", // Male
 }

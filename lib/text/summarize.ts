@@ -1,22 +1,22 @@
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
 
 interface SummarizeTextComponents {
   /**
-   * API Token for accessing the Deepgram and Edenai APIs.
+   * API Tokens for accessing the Deepgram and Edenai APIs.
    */
   apiTokens: {
     Deepgram: string;
     Edenai: string;
   };
   /**
-   * A boolean flag indicates whether logger is enabled.
+   * Enables logging when set to true.
    */
   logger?: boolean;
 }
 
 interface EdenaiResponse {
   /**
-   * The summarized result.
+   * The summarized text result.
    */
   result: string;
   /**
@@ -27,19 +27,19 @@ interface EdenaiResponse {
 
 interface EdenaiComponents {
   /**
-   * The text to summarize.
+   * The text to be summarized.
    */
   text: string;
   /**
-   * The provider to use for summarization.
+   * The AI provider to use for summarization.
    */
   providers: "openai" | "cohere" | "alephalpha" | "nlpcloud" | "anthropic";
   /**
-   * The language code of the text.
+   * The ISO language code of the input text.
    */
   languageCode: string;
   /**
-   * The number of output sentences desired in the summarized text.
+   * The desired number of sentences in the summarized output.
    */
   output_sentences: number;
 }
@@ -49,21 +49,27 @@ interface EdenaiComponents {
  */
 export class SummarizeText {
   /**
-   * The API URLs for Deepgram and Edenai.
+   * The base URLs for the Deepgram and Edenai APIs.
    * @private
    */
   private readonly apiUrl: { Deepgram: string; Edenai: string };
-  /**
-   * The API tokens for accessing the Deepgram and Edenai APIs.
-   * @public
-   */
-  public apiTokens: { Deepgram: string; Edenai: string };
-  /**
-   * A boolean flag indicates whether logging is enabled.
-   * @public
-   */
-  public logger: boolean;
 
+  /**
+   * The API tokens for authenticating with Deepgram and Edenai services.
+   * @private
+   */
+  private readonly apiTokens: { Deepgram: string; Edenai: string };
+
+  /**
+   * A flag to enable or disable logging.
+   * @private
+   */
+  private readonly logger: boolean;
+
+  /**
+   * Creates a new instance of SummarizeText.
+   * @param components - Configuration options for the SummarizeText instance.
+   */
   constructor(components: SummarizeTextComponents) {
     this.apiUrl = {
       Deepgram: "https://api.deepgram.com/v1/read",
@@ -75,63 +81,76 @@ export class SummarizeText {
 
   /**
    * Summarizes the provided text using the Edenai API.
-   * @param components An object containing the text to summarize, the provider, and the language code.
+   * @param components - An object containing the text to summarize and other parameters.
    * @returns A Promise that resolves with the summarized text object.
+   * @throws Will throw an error if the API request fails.
    */
   public async edenai(components: EdenaiComponents): Promise<EdenaiResponse> {
-    const postRequest = await axios.post(
-      this.apiUrl.Edenai,
-      {
-        output_sentences: components.output_sentences,
-        providers: components.providers,
-        text: components.text,
-        language: components.languageCode,
-      },
-      {
-        headers: {
-          authorization: `Bearer ${this.apiTokens.Edenai}`,
+    try {
+      const response: AxiosResponse = await axios.post(
+        this.apiUrl.Edenai,
+        {
+          output_sentences: components.output_sentences,
+          providers: components.providers,
+          text: components.text,
+          language: components.languageCode,
         },
-      }
-    );
-    const response: EdenaiResponse = postRequest.data[components.providers];
-    this.createLog(response);
-    return response;
+        {
+          headers: {
+            authorization: `Bearer ${this.apiTokens.Edenai}`,
+          },
+        }
+      );
+      const result: EdenaiResponse = response.data[components.providers];
+      this.log(result);
+      return result;
+    } catch (error) {
+      this.log(`Error in Edenai summarization: ${error}`);
+      throw error;
+    }
   }
 
   /**
    * Summarizes the provided text using the Deepgram API.
-   * @param text The text to summarize.
-   * @param languageCode The language code of the text.
+   * @param text - The text to summarize.
+   * @param languageCode - The ISO language code of the text.
    * @returns A Promise that resolves with the summarized text.
+   * @throws Will throw an error if the API request fails.
    */
   public async deepgram(text: string, languageCode: string): Promise<string> {
-    const postRequest = await axios.post(
-      `${this.apiUrl.Deepgram}?language=${languageCode}&summarize=v2`,
-      { text },
-      {
-        headers: {
-          Authorization: `Token ${this.apiTokens.Deepgram}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = postRequest.data.results.summary.text;
-    this.createLog(response);
-    return response;
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.apiUrl.Deepgram}?language=${languageCode}&summarize=v2`,
+        { text },
+        {
+          headers: {
+            Authorization: `Token ${this.apiTokens.Deepgram}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const result: string = response.data.results.summary.text;
+      this.log(result);
+      return result;
+    } catch (error) {
+      this.log(`Error in Deepgram summarization: ${error}`);
+      throw error;
+    }
   }
 
   /**
    * Logs the provided information if logging is enabled.
-   * @param info Information to be logged. Can be a string or an EdenaiResponse object.
+   * @param info - Information to be logged. Can be a string or an EdenaiResponse object.
+   * @private
    */
-  private createLog(info: EdenaiResponse | string): void {
+  private log(info: EdenaiResponse | string): void {
     if (!this.logger) return;
 
-    const prefix =
-      typeof info == "object"
-        ? `* Results: ${info.result}\nCosts: ${info.cost}`
-        : `* Results: ${info}`;
+    const message =
+      typeof info === "object"
+        ? `Results: ${info.result}\nCosts: ${info.cost}`
+        : `Results: ${info}`;
 
-    console.log(`[DEBUG GoogleGemini]\n${prefix}`);
+    console.log(`[DEBUG SummarizeText]\n* ${message}`);
   }
 }
