@@ -39,7 +39,7 @@ export class GoogleGemini {
     }
 
     this.client = new GoogleGenerativeAI(config.apiKey);
-    this.model = this.client.getGenerativeModel({ model: config.model });
+    this.model = this.client.getGenerativeModel({ model: config.model || "gemini-1.5-flash" });
     this.enableLogging = config.enableLogging ?? false;
   }
 
